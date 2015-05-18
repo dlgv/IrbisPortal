@@ -4,13 +4,19 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head runat="server">
-    <title>BotUAC</title>   <!-- отображается на закладке в экплорере -->
+    <title>BotUAC</title>   
     <style type="text/css">
         .FixedHeader {
             position: absolute;
             font-weight: normal;
             vertical-align:text-bottom;
         }      
+    </style>
+    <style type="text/css">
+        .uppercase
+        {
+            text-transform: uppercase;
+        }    
     </style>
 </head>
 <body>
@@ -21,7 +27,8 @@
 
         <asp:TextBox ID="txtUserName" runat="server"  AutoPostBack="true" 
            style="position:absolute;top: 39px; left: 104px; width: 146px;" 
-            Visible="false" OnTextChanged="txtUserName_TextChanged" >
+            Visible="false" OnTextChanged="txtUserName_TextChanged"
+            CssClass="uppercase" >
            </asp:TextBox>
 
         <asp:Label ID="lblUserName_Error" runat="server"  
@@ -36,12 +43,11 @@
         <asp:ImageButton ID="btnDelUser" style="position:absolute; top: 41px; left: 280px;"
         runat="server" ImageUrl="~/Resources/Button_Del_16x16.png" 
             onClientClick="return confirm('Are you sure you want to delete the user?')"
-            onclick="btnDelUser_Click" 
-            ToolTip="Delete current User" />
+            onclick="btnDelUser_Click" />
         
         <asp:ImageButton ID="btnAddUser" style="position:absolute; top: 40px; left: 259px;"
         runat="server" ImageUrl="~/Resources/Button_Add_16x16.png" 
-            onclick="btnAddUser_Click" ToolTip="Add new User" />
+            onclick="btnAddUser_Click" />
         
         <asp:Label ID="lblAction" runat="server" Text="Action"  
             style="position: absolute; top: 74px; left: 18px; width: 49px; ">
@@ -122,26 +128,23 @@
 
         <asp:Button ID="btnSave" runat="server" Text="Save" 
             style="position:absolute; top: 496px; left: 177px; width: 92px; right: 543px;" 
-            onclick="btnSave_Click" ToolTip="Save User" />
+            onclick="btnSave_Click"  />
                 
         <asp:Button ID="btnClose" runat="server" Text="Close" 
-                style="position:absolute; top: 496px; left: 273px; width: 92px;" />
+                style="position:absolute; top: 496px; left: 273px; width: 92px;" 
+            onclick="btnClose_Click" />
     
         <asp:Button ID="btnCancel" runat="server" Text="Restore" 
                 style="position:absolute; top: 496px; left: 81px; width: 92px;" 
-                onclick="btnCancel_Click" ToolTip="Cancel change User" />
+                onclick="btnCancel_Click" />
                 
         <asp:Button ID="btnSaveNew" runat="server" Text="Save New" 
             style="position:absolute; top: 496px; left: 177px; width: 92px; right: 543px;" 
-            onclick="btnSaveNew_Click" Visible="False" ToolTip="Save new User" />
+            onclick="btnSaveNew_Click" Visible="False" />
                 
         <asp:Button ID="btnCancelNew" runat="server" Text="Cancel New" 
                 style="position:absolute; top: 496px; left: 81px; width: 92px;" 
-                onclick="btnCancelNew_Click" Visible="False" 
-            ToolTip="Cancel add new User" />
-    
-    
-    
+                onclick="btnCancelNew_Click" Visible="False" />
     
         <asp:Button ID="btnAllow" runat="server" Text="Allow" 
             style="position:absolute; top: 120px; left: 260px;" BackColor="White" 

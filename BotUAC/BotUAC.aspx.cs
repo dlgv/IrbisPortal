@@ -20,9 +20,6 @@ namespace BotUAC
 {
     public partial class WebFormBotUAC : System.Web.UI.Page
     {
-
-        private List<PermRow> GridData = new List<PermRow>();
-
         private const int nColUserAllow = 2; // с 0 !
         private const int nColUserDeny = 3; // с 0 !
 
@@ -35,6 +32,8 @@ namespace BotUAC
         private TUser userModifyBeforeAdd = null;    // /
 
         private string actionModify = null; // копия имени корректируемой акции
+
+        private List<PermRow> GridData = new List<PermRow>();
 
         bool bUpdateScr = false;
         string message = null;
@@ -58,15 +57,25 @@ namespace BotUAC
                 appSet = new TAppSettings(sMain + "Irbis.xml");
                 if (!appSet.Load())
                 {
-                    Response.Write("Error application config-file load: " + appSet.FileNameFull);  // "<br>" + 
+                    //Response.Write("Error application config-file load: " + appSet.FileNameFull);  // "<br>" + 
+                    Response.Write(TMess.Mess0001 + " " + appSet.FileNameFull);  // "<br>" + 
                     return; //======================>
                 }
                 permSet = new TPermissionsSettings(appSet.PermissionsFilePath);  // после ЗАГРУЗКИ appSet !!!
                 if (!permSet.Load())
                 {
-                    Response.Write("Error permissions config-file load: " + permSet.FileNameFull); // "<br>" + 
+                    //Response.Write("Error permissions config-file load: " + permSet.FileNameFull); // "<br>" + 
+                    Response.Write(TMess.Mess0002 + " " + permSet.FileNameFull); // "<br>" + 
                     return; //======================>
                 }
+
+                // доопределяем контролы
+                btnDelUser.ToolTip  = TMess.Mess0003; // "Delete current User";
+                btnAddUser.ToolTip  = TMess.Mess0004; // "Add new User";
+                btnSave.ToolTip     = TMess.Mess0005; // "Save User";
+                btnCancel.ToolTip   = TMess.Mess0006; // "Cancel change User";
+                btnSaveNew.ToolTip  = TMess.Mess0007; // "Save new User";
+                btnCancelNew.ToolTip= TMess.Mess0008; // "Cancel add new User";
 
                 // свойства контролов по умолчанию
                 txtUserName.Visible = false;
@@ -107,7 +116,8 @@ namespace BotUAC
                 }
                 if (cbxUserName.Items.Count == 0)  // не должно быть
                 {
-                    Response.Write("Error permissions config-file - empty Users list: " + permSet.FileNameFull); // "<br>" + 
+                    //Response.Write("Error permissions config-file - empty Users list: " + permSet.FileNameFull); // "<br>" + 
+                    Response.Write(TMess.Mess0009 + " " + permSet.FileNameFull); // "<br>" + 
                     return; //======================>
                 }
 
@@ -124,7 +134,8 @@ namespace BotUAC
                 }
                 if (cbxAction.Items.Count == 0)  // не должно быть
                 {
-                    Response.Write("Error permissions config-file - empty Actionы list: " + permSet.FileNameFull); // "<br>" + 
+                    //Response.Write("Error permissions config-file - empty Actionы list: " + permSet.FileNameFull); // "<br>" + 
+                    Response.Write(TMess.Mess0010 + " " + permSet.FileNameFull); // "<br>" + 
                     return; //======================>
                 }
 
@@ -294,7 +305,8 @@ namespace BotUAC
             }
             else
             {
-                Response.Write("Restore Error : user " + UserName + " not found!"); 
+                //Response.Write("Restore Error - user not found:" + " \"" + UserName + "\" !");
+                Response.Write(TMess.Mess0013 + " \"" + UserName + "\" !");
             }
         }
 
@@ -887,9 +899,6 @@ namespace BotUAC
                 }
 
                 //------------------------------
-                // проверяем поля ввода Нового пльзователя
-                txtUserName.Text = txtUserName.Text.Trim();
-
                 // проверяем значение поля Имени пользователя
                 if (!ValidateUserName())
                 {
@@ -1012,19 +1021,23 @@ namespace BotUAC
             // стриаем старую ошибку 
             lblUserName_Error.Text = "";
 
+            // нормируем текст поля ввода Нового пльзователя - ЗАГЛАВНЫМИ на всякий влучай (переводились стилем при вводе) !!!
+            txtUserName.Text = txtUserName.Text.Trim().ToUpper();
+
             // === заполненность Имени
             if (txtUserName.Text.Length == 0)   // пустое имя поля не сохраняем !
             {
                 isValid = false;
-                lblUserName_Error.Text = (lblUserName_Error.Text == "" ? "" : " ") + "User name is empty!";
+                //lblUserName_Error.Text = (lblUserName_Error.Text == "" ? "" : " ") + "User name is empty!";
+                lblUserName_Error.Text = (lblUserName_Error.Text == "" ? "" : " ") + TMess.Mess0011;
             }
             // === уникальность Имени
             int ind = cbxUserName.Items.IndexOf(cbxUserName.Items.FindByText(txtUserName.Text));
             if (ind >= 0)  // нет уникальности
             {
-                //Response.Write("Error: User name \"" + txtUserName.Text + "\" is already registered!");  // "<br>" + 
                 isValid = false;
-                lblUserName_Error.Text = (lblUserName_Error.Text == "" ? "" : " ") + "User name \"" + txtUserName.Text + "\" is already registered!";
+                //lblUserName_Error.Text = (lblUserName_Error.Text == "" ? "" : " ") + "User name is already registered:" + " \"" + txtUserName.Text + "\ !";
+                lblUserName_Error.Text = (lblUserName_Error.Text == "" ? "" : " ") +  TMess.Mess0012 + " \"" + txtUserName.Text + "\" !";
             }
             return isValid; //=================>
 
@@ -1063,6 +1076,22 @@ namespace BotUAC
                     cbx.SelectedIndex = 0; // c 0 !?
                 }
             }
+        }
+
+        protected void btnClose_Click(object sender, EventArgs e)
+        {
+            /*
+            //Response.Redirect("~/Logout.aspx");
+
+            // http://stackoverflow.com/questions/31221/response-redirect-using-path
+            //                 http://localhost:49843/BotUAC.aspx
+            // !!! не находит: http://localhost/Logout.aspx
+            //Response.Redirect(String.Format("http://{0}/Logout.aspx", Request.ServerVariables["SERVER_NAME"]));
+
+            // явное задание  (Work) - работает !
+            Response.Redirect("http://localhost:49843/Logout.aspx");
+            */
+
         }   // SortCbxItems()
 
 

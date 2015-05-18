@@ -81,6 +81,7 @@
     <Compile Include="TException.cs" />
     <Compile Include="TExtension.cs" />
     <Compile Include="TExtensions.cs" />
+    <Compile Include="TMess.cs" />
     <Compile Include="TParameter.cs" />
     <Compile Include="TParameters.cs" />
     <Compile Include="TPermission.cs" />
