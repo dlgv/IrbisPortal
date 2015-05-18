@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<appSettings>
+  <logsDir>./logs</logsDir>
+  <portNum>1240</portNum>
+  <permissionsFilePath>E:\VS2008.WRK\DLG_014_Irbis(IIS)\IrbisPortal\BotUAC\Xml\Permissions.xml</permissionsFilePath>
+</appSettings>
