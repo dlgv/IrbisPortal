@@ -52,6 +52,13 @@ namespace BotUAC
             xe.Add(permissions.ToXElement());
             return xe; //==============>
         }
+
+        public TUserRole Clone()
+        {
+            TUserRole retUserRole = new TUserRole(this.roleName, this.permissions.Clone());
+            return retUserRole; //==============>
+        }
+
         public override string ToString()
         {
             return roleName + Environment.NewLine + permissions.ToString();

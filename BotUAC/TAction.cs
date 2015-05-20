@@ -44,6 +44,13 @@ namespace BotUAC
             xe.Add(new XElement("actionName", new XText(this.actionName)));
             return xe; //==============>
         }
+
+        public TAction Clone()
+        {
+            TAction retAction = new TAction(this.actionId, this.actionName);
+            return retAction; //==============>
+        }
+
         public override string ToString()
         {
             return actionId + ", " + actionName;

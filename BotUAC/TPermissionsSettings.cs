@@ -38,6 +38,19 @@ namespace BotUAC
             fileNameFull = "";
             message = "";
         }
+
+        protected TPermissionsSettings(string FileName, string FileNameFull, string Message)  // конструктор  (для структуры нельзя без прараметров !!!)
+        {
+            actions = new TActions();
+            extensions = new TExtensions();
+            userRoles = new TUserRoles();
+            users = new TUsers();
+            fileName = FileName;
+            fileNameFull = FileNameFull;
+            message = Message;
+        }
+
+
         // свойства
         public TActions Actions { get { return actions; } set { actions = value; } }
         public TExtensions Extensions { get { return extensions; } set { extensions = value; } }
@@ -234,6 +247,28 @@ namespace BotUAC
             return bRet; //=======================>
 
         } // Save()
+
+        public TPermissionsSettings Clone()      // internal - только в классе или в той-же программе т(сборке)
+        {
+            TPermissionsSettings retermissionsSettings = new TPermissionsSettings(this.fileName, this.fileNameFull, this.message);
+            retermissionsSettings.Actions = this.actions.Clone();
+            retermissionsSettings.Extensions = this.extensions.Clone();
+            retermissionsSettings.UserRoles = this.userRoles.Clone();
+            retermissionsSettings.Users = this.users.Clone();
+
+            return retermissionsSettings; //===========>
+        }
+
+
+        //public TActions Actions { get { return actions; } set { actions = value; } }
+        //public TExtensions Extensions { get { return extensions; } set { extensions = value; } }
+        //public TUserRoles UserRoles { get { return userRoles; } set { userRoles = value; } }
+        //public TUsers Users { get { return users; } set { users = value; } }
+
+        //public string FileName { get { return fileName; } }
+        //public string FileNameFull { get { return fileNameFull; } }
+        //public string Message { get { return message; } }
+
 
     }  // class TPermissionsSettings
 

@@ -36,29 +36,6 @@
   </extensions>
   <users>
     <user>
-      <userName>GAAB</userName>
-      <permissions>
-        <permission action="unloadExtension" type="allow">
-          <parameters>
-            <parameter name="extensionId" value="1000" />
-          </parameters>
-        </permission>
-        <permission action="unloadExtension" type="deny">
-          <parameters />
-        </permission>
-        <permission action="loadExtension" type="allow">
-          <parameters>
-            <parameter name="extensionId" value="1000" />
-          </parameters>
-        </permission>
-        <permission action="loadExtension" type="deny">
-          <parameters>
-            <parameter name="extensionId" value="1000" />
-          </parameters>
-        </permission>
-      </permissions>
-    </user>
-    <user>
       <userName>GAJE</userName>
       <permissions>
         <permission action="unloadExtension" type="allow">
@@ -82,35 +59,16 @@
       </permissions>
     </user>
     <user>
-      <userName>OLEG0</userName>
-      <permissions>
-        <permission action="loadExtension" type="allow">
-          <parameters>
-            <parameter name="extensionId" value="1000" />
-            <parameter name="extensionId" value="1002" />
-            <parameter name="extensionId" value="1010" />
-          </parameters>
-        </permission>
-        <permission action="loadExtension" type="deny">
-          <parameters>
-            <parameter name="extensionId" value="1001" />
-            <parameter name="extensionId" value="1003" />
-            <parameter name="extensionId" value="1011" />
-          </parameters>
-        </permission>
-      </permissions>
-    </user>
-    <user>
       <userName>OLEG1</userName>
       <permissions>
         <permission action="unloadExtension" type="allow">
           <parameters>
-            <parameter name="extensionId" value="1002" />
+            <parameter name="extensionId" value="1010" />
           </parameters>
         </permission>
         <permission action="unloadExtension" type="deny">
           <parameters>
-            <parameter name="extensionId" value="1003" />
+            <parameter name="extensionId" value="1011" />
           </parameters>
         </permission>
         <permission action="loadExtension" type="allow">
@@ -121,7 +79,6 @@
         <permission action="loadExtension" type="deny">
           <parameters>
             <parameter name="extensionId" value="1001" />
-            <parameter name="extensionId" value="1011" />
           </parameters>
         </permission>
       </permissions>
@@ -131,81 +88,17 @@
       <permissions>
         <permission action="loadExtension" type="allow">
           <parameters>
+            <parameter name="extensionId" value="1000" />
             <parameter name="extensionId" value="1001" />
-          </parameters>
-        </permission>
-        <permission action="loadExtension" type="deny">
-          <parameters>
             <parameter name="extensionId" value="1002" />
-          </parameters>
-        </permission>
-        <permission action="unloadExtension" type="allow">
-          <parameters>
             <parameter name="extensionId" value="1003" />
-          </parameters>
-        </permission>
-        <permission action="unloadExtension" type="deny">
-          <parameters>
             <parameter name="extensionId" value="1010" />
-          </parameters>
-        </permission>
-      </permissions>
-    </user>
-    <user>
-      <userName>OLEG3</userName>
-      <permissions>
-        <permission action="unloadExtension" type="allow">
-          <parameters>
-            <parameter name="extensionId" value="1010" />
-          </parameters>
-        </permission>
-        <permission action="unloadExtension" type="deny">
-          <parameters>
-            <parameter name="extensionId" value="1011" />
-          </parameters>
-        </permission>
-        <permission action="loadExtension" type="allow">
-          <parameters>
-            <parameter name="extensionId" value="1003" />
-          </parameters>
-        </permission>
-        <permission action="loadExtension" type="deny">
-          <parameters>
-            <parameter name="extensionId" value="1010" />
-          </parameters>
-        </permission>
-      </permissions>
-    </user>
-    <user>
-      <userName>OLEG4</userName>
-      <permissions>
-        <permission action="unloadExtension" type="allow">
-          <parameters>
-            <parameter name="extensionId" value="1000" />
-          </parameters>
-        </permission>
-        <permission action="unloadExtension" type="deny">
-          <parameters>
-            <parameter name="extensionId" value="1000" />
-          </parameters>
-        </permission>
-        <permission action="loadExtension" type="allow">
-          <parameters>
-            <parameter name="extensionId" value="1001" />
             <parameter name="extensionId" value="1011" />
           </parameters>
         </permission>
         <permission action="loadExtension" type="deny">
-          <parameters>
-            <parameter name="extensionId" value="1001" />
-            <parameter name="extensionId" value="1011" />
-          </parameters>
+          <parameters />
         </permission>
-      </permissions>
-    </user>
-    <user>
-      <userName>OLEG5</userName>
-      <permissions>
         <permission action="unloadExtension" type="allow">
           <parameters />
         </permission>
@@ -219,7 +112,27 @@
             <parameter name="extensionId" value="1011" />
           </parameters>
         </permission>
+      </permissions>
+    </user>
+    <user>
+      <userName>GAAB</userName>
+      <permissions>
+        <permission action="unloadExtension" type="allow">
+          <parameters>
+            <parameter name="extensionId" value="1000" />
+          </parameters>
+        </permission>
+        <permission action="unloadExtension" type="deny">
+          <parameters />
+        </permission>
         <permission action="loadExtension" type="allow">
+          <parameters>
+            <parameter name="extensionId" value="1002" />
+            <parameter name="extensionId" value="1010" />
+            <parameter name="extensionId" value="1011" />
+          </parameters>
+        </permission>
+        <permission action="loadExtension" type="deny">
           <parameters>
             <parameter name="extensionId" value="1000" />
             <parameter name="extensionId" value="1001" />
@@ -228,9 +141,6 @@
             <parameter name="extensionId" value="1010" />
             <parameter name="extensionId" value="1011" />
           </parameters>
-        </permission>
-        <permission action="loadExtension" type="deny">
-          <parameters />
         </permission>
       </permissions>
     </user>

@@ -194,6 +194,16 @@ namespace BotUAC
             return xe; //==============>
         }
 
+        public TExtensions Clone()
+        {
+            TExtensions retExtensions = new TExtensions();
+            foreach (TExtension p in this.myAL)
+            {
+                retExtensions.Add(p.Clone());
+            }
+            return retExtensions; //==============>
+        }
+
         public override string ToString()
         {
             string s = "";

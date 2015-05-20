@@ -164,16 +164,6 @@ namespace BotUAC
             myAL.Clear();
         }
 
-        public XElement ToXElement()
-        {
-            XElement xe = new XElement("users");
-            foreach (TUser p in this.myAL)
-            {
-                xe.Add(p.ToXElement());
-            }
-            return xe; //==============>
-        }
-
         public bool Like(TUsers users)
         {
             bool bRet = true;
@@ -220,6 +210,42 @@ namespace BotUAC
                 }
             }
             return bRet; //==============>
+        }
+
+        public TUsers Clone()
+        {
+            TUsers retUsers = new TUsers();
+            foreach (TUser p in this.myAL)
+            {
+                retUsers.Add(p.Clone());
+            }
+            return retUsers; //==============>
+        }
+
+        public XElement ToXElement()
+        {
+            //XElement xe = new XElement("users");
+            //foreach (TUser p in this.myAL)
+            //{
+            //    xe.Add(p.ToXElement());
+            //}
+
+            // сначала создаем отсортированный массив имен - в этом порядке будем формировать список результата
+            List<string> aTmp = new List<string>();
+            foreach (TUser p in this.myAL)
+            {
+                aTmp.Add(p.UserName);
+            }
+            // сорируем массив имен
+            aTmp.Sort();
+            // добавляем в результат по алфавиту
+            XElement xe = new XElement("users");
+            foreach (string s in aTmp)
+            {
+                xe.Add(this.FindUser(s).ToXElement());  // должен быть - сами массив сортировали!
+            }
+
+            return xe; //==============>
         }
 
         public override string ToString()

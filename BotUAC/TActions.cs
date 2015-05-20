@@ -173,6 +173,16 @@ namespace BotUAC
             return xe; //==============>
         }
 
+        public TActions Clone()
+        {
+            TActions retActions = new TActions();
+            foreach (TAction p in this.myAL)
+            {
+                retActions.Add(p.Clone());
+            }
+            return retActions; //==============>
+        }
+
         public override string ToString()
         {
             string s = "";

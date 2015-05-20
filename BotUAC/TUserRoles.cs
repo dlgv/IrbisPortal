@@ -171,6 +171,16 @@ namespace BotUAC
             return xe; //==============>
         }
 
+        public TUserRoles Clone()
+        {
+            TUserRoles retUserRoles = new TUserRoles();
+            foreach (TUserRole p in this.myAL)
+            {
+                retUserRoles.Add(p.Clone());
+            }
+            return retUserRoles; //==============>
+        }
+
         public override string ToString()
         {
             string s = "";

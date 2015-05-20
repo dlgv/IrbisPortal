@@ -44,6 +44,13 @@ namespace BotUAC
             xe.Add(new XElement("extensionName", new XText(this.extensionName)));
             return xe; //==============>
         }
+
+        public TExtension Clone()
+        {
+            TExtension retExtension = new TExtension(this.ExtensionId, this.ExtensionName);
+            return retExtension; //==============>
+        }
+
         public override string ToString()
         {
             return extensionId + ", " + extensionName;

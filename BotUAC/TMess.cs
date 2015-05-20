@@ -7,8 +7,8 @@ namespace BotUAC
     public class TMess : Exception
     {
         // ошибка при загрузке (обработке) файла
-        public const string Mess0001 = "Error application config-file load:";   // : имя файла
-        public const string Mess0002 = "Error permissions config-file load:";   // : имя файла
+        public const string Mess0001 = "Failed connecting to the application database.";   
+        public const string Mess0002 = "Failed connecting to the permissions database.";   
 
         // тултипы кнопок
         public const string Mess0003 = "Delete current User";
@@ -30,5 +30,8 @@ namespace BotUAC
         // ошибка пи отмене изменений для пользователя - не должно такое произойти!
         public const string Mess0013 = "Restore Error - user not found:";  // : имя пользователя
 
-     } // class TMessages
+        // запрос подтверждения удалнния пользователя
+        public const string Mess0014 = "Are you sure you want to delete the user?";  
+
+    } // class TMessages
 }
