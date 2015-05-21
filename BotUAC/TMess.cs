@@ -31,7 +31,16 @@ namespace BotUAC
         public const string Mess0013 = "Restore Error - user not found:";  // : имя пользователя
 
         // запрос подтверждения удалнния пользователя
-        public const string Mess0014 = "Are you sure you want to delete the user?";  
+        public const string Mess0014 = "Are you sure you want to delete the user?";
+
+        // тултипы кнопок заголовка сетки: Allow, Deny
+        public const string Mess0015 = "Change the values of all cells in the grid column"; // Allow
+        public const string Mess0016 = "Change the values of all cells in the grid column"; // Deny
+
+        // загрузка пераметров приложения из web.config
+        public const string Mess0017 = "In the web configuration is not specified AppSettings parameters";
+        public const string Mess0018 = "In the web configuration is not specified AppSettings.irbisFileNameAndPath";
+        public const string Mess0019 = "In the web configuration is specified empty AppSettings.irbisFileNameAndPath";
 
     } // class TMessages
 }

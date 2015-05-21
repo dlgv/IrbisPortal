@@ -162,13 +162,11 @@
                   
             <asp:Button ID="btnSaveNew" runat="server" Text="Save New" 
                 style="position:absolute; top: 496px; left: 270px; width: 92px; right: 391px;" 
-                OnClientClick="setOnBeforeUnload(false)"
                 onclick="btnSaveNew_Click" Visible="False" />
                     
 
             <asp:Button ID="btnCancel" runat="server" Text="Cancel" 
                 style="position:absolute; top: 496px; left: 176px; width: 92px;" 
-                OnClientClick="setOnBeforeUnload(false)"
                 onclick="btnCancel_Click" />
                     
             <asp:Button ID="btnSave" runat="server" Text="Save" 
@@ -185,54 +183,72 @@
     </form>
 
     
+    <body>
+        <button onclick="GetOnClickAttrValue (this);" >Get the value of the onclick attribute!</button>
+        <button onclick="SetOnClickAttrValue (this);" >Set the value of the onclick attribute!</button>
+    </body>
+
 
     <script type="text/javascript" language="JavaScript">
-        // !!! скрипт расположить в конце страницы - чтобы выполнялся после формирования контролов !!!
-        
-        //=====================
-        //=== подтверждающий запрос при закрытии измененного окна
-        
-        // включение.выключение подтверждающего запроса при закрытии измененного окна
-        //window.onbeforeunload = confirmExit;
-        function setOnBeforeUnload(on) {
-            window.onbeforeunload = (on) ? confirmExit : null;
+    // If changes not saved, prompt user
+    window.onbeforeunload = confirmExit;
+    function confirmExit() {
+        var elem = document.getElementById("btnSave");
+        if (elem)
+            //if (elem.type == 'submit')  
+            if (elem.type == 'submit' && elem.disabled == true)  
+                return  // закрытие без подтверждения ================>
+            else                
+                return 'You have unsaved changes.' // закрытие с подтвержденим ======> 
+    }
+    </script>
+    
+
+
+    
+    
+    
+    
+    
+    <script type="text/javascript">
+        //http://help.dottoro.com/ljuurooj.php
+        function GetOnClickAttrValue (button) {
+            //alert (button.getAttribute ("onCliCk", 0));
+            //alert (button.getAttribute ("onCliCk", 1));        // Internet Explorer (case-sensitive search, returns null)
+
+            str = document.getElementById( "GridView1_ctl02_ckbDeny" ).getAttribute ("onCliCk", 0)
+            alert(str);
+
+            /*        
+            var str;
+            var str2;
+            // onclick="javascript:setTimeout('__doPostBack(\'GridView1$ctl03$ckbDeny\',\'\')', 0)"
+            str = document.getElementById( "GridView1_ctl02_ckbDeny" ).getAttribute ("onCliCk", 0)
+            var ind = str.indexOf(":");
+            str2 = str.substring(0, ind+1) + "setBunload(false);" + str.substring(ind+2);
+            alert(str2);
+            //alert (document.getElementById( "GridView1_ctl02_ckbDeny" ).getAttribute ("onCliCk", 1));        // Internet Explorer (case-sensitive search, returns null)
+            */
         }
         
-        // сам подтверждающий запрос при закрытии измененного окна
-        function confirmExit() {
-            var elem = document.getElementById("btnSave"); // недоступная кнопка Save - признак неизмененности данных!
-            if (elem) {
-                if (elem.type == 'submit' && elem.disabled == true)  
-                    return  // закрытие без подтверждения ================>
-                else                
-                    return 'You have unsaved changes.' // закрытие с подтвержденим ======> 
-            }
-        }
-        
-        // сразу при загрузке включаем подтверждающий запрос при закрытии измененного окна
-        setOnBeforeUnload(true)
-        
-        // т.к. серверные контролы при срабатывании выгружают страницу, то в каждом из них надо
-        // поставить от ключение подтверждающего запроса (иначе запрос будет при срабатывании каждого контрола) !
-        // (в атрибут OnClick добавляем на первое место вызов ф-ии отключения запоса)
-        function Set_OnClickAttrValue()
-        {
-            //alert ("SetOnClickAttrValue()");
+        function SetOnClickAttrValue (button) {
+            //alert (button.getAttribute ("onCliCk", 0));
+            //alert (button.getAttribute ("onCliCk", 1));        // Internet Explorer (case-sensitive search, returns null)
 
             /*
             // работает:
             str = document.getElementById( "GridView1_ctl02_ckbDeny" ).getAttribute ("onCliCk", 0)
             var ind = str.indexOf(":");
-            str2 = str.substring(0, ind+1) + "setOnBeforeUnload(false);" + str.substring(ind+1);
+            str2 = str.substring(0, ind+1) + "setBunload(false);" + str.substring(ind+1);
             document.getElementById( "GridView1_ctl02_ckbDeny" ).setAttribute ("onCliCk", str2)
             */
             
-    	    var str;
-    	    var str2;
+        	var str;
+        	var str2;
             var ind;
             var idElem;
-    	    var elems = document.getElementsByTagName('*');
-    	    //alert("Элементов: " + elems.length)
+        	var elems = document.getElementsByTagName('*');
+        	//alert("Элементов: " + elems.length)
             var bRavno = false;
             var bRavno1 = false;
             var bRavno2 = false;
@@ -243,42 +259,139 @@
                 idName = elems[i].getAttribute('name');
                 if (idName != null)
                 {
-                    // изменяем/добавляем атрибуты контролов
-                    bRavno1 = (idElem.substr(idElem.length - 8) == "ckbAllow");
-                    bRavno2 = (idElem.substr(idElem.length - 7) == "ckbDeny");
-                    if ((idName == "cbxUserName") || (idName == "cbxAction") ||
-                       (idName == "btnAllow") || (idName == "btnDeny") ||
+
+                   bRavno1 = (idElem.substr(idElem.length - 8) == "ckbAllow");
+                   bRavno2 = (idElem.substr(idElem.length - 7) == "ckbDeny");
+                   if ((idName == "cbxUserName") || (idName == "cbxAction") ||
                        (idName == "btnAddUser") || (idName == "btnDelUser") ||
                        (idName == "btnSave") || (idName == "btnCancel") ||
                        (idName == "btnSaveNew") || (idName == "btnCancelNew") ||
-                        bRavno1 || bRavno2 || idName == "txtUserName")
-                    {
-                        //alert("2: idName = " + idName);
-	                    str = elems[i].getAttribute("onClick", 0);
-	                    if (str != null)
-	                    {
-                            // контролы (списки, чекбоксы) с атрибутом - корректируем атрибут (вставляем после начального "javascript:")
+                       bRavno1 || bRavno2 || idName == "txtUserName")
+                   {
+                        //alert("idName = " + idName);
+		                str = elems[i].getAttribute("onClick", 0);
+		                if (str != null)
+		                {
                             //alert("idName = " + idName);
                             ind = str.indexOf(":");
-                            str2 = str.substring(0, ind+1) + "setOnBeforeUnload(false);" + str.substring(ind+1);
+                            str2 = str.substring(0, ind+1) + "setBunload(false);" + str.substring(ind+1);
                             //alert(str2);
-	                        elems[i].setAttribute("onClick", str2);
-	                    } else {
-                            // контролы (кнопки) без атрибута - добавляем атрибут
-	                        elems[i].setAttribute("onClick", "javascript:setOnBeforeUnload(false);");
-	                    }
-                    }
+		                    elems[i].setAttribute("onClick", str2);
+		                }
+                   }
                 }
-            } // for по элементам документа
-        } // Set_OnClickAttrValue()
-    
-        // доопределяем OnClisk своих серверных контролов
-        Set_OnClickAttrValue();
-    
+
+//                if (idType == "checkbox" || idType == "submit"  || idType == "image" )                  
+//                {
+//                    //alert("idElem = " + idElem);
+//                    //alert("idName = " + idName);
+//                    if (idElem == "GridView1_ctl02_ckbDeny")
+//                    {
+//                       // alert("Type = " + idType);
+//                        //alert("idElem = " + idElem);
+//                        //alert("idElem = '" + idElem.substr(idElem.length - 7) + "'");
+//                        //alert("idElem равно = " + (idElem.substr(idElem.length - 7) == "ckbDeny"));
+//                        //bRavno = (idElem.substr(idElem.length - 7) == "ckbDeny");
+//                        //alert("idElem равно = " + bRavno);
+//                    }
+//                }
+//                
+//                    bRavno = (idElem.substr(idElem.length - 7) == "ckbDeny");
+//                    alert("idElem равно = " + bRavno);
+
+                
+//                var bRavno = false;
+//                bRavno = (idElem.substr(idElem.length - 7) == "ckbDeny");
+//                             (idElem.substr(idElem.length - 8) == "ckbAllow");
+                //if (idElem.substr(idElem.length - 7) == "ckbDeny")
+                
+//                    alert("Substr idElem = " + idElem);
+                
+//                if (1 == 1)
+//                {
+//                    alert("Substr idElem = " + idElem);
+//                    //alert("Substr idElem = " + idElem.substr(idElem.length - 7));
+//                }
+//                
+                
+                /*
+                if (idElem.substr(idElem.length - 7) == "ckbDeny")
+                {
+                    alert("idElem = " + idElem);
+		            str = elems[i].getAttribute("onClick", 0);
+                    ind = str.indexOf(":");
+                    str2 = str.substring(0, ind+1) + "setBunload(false);" + str.substring(ind+1);
+                    alert(str2);
+		            elems[i].setAttribute("onClick", str2);
+                    //alert("str2 = " + str2);
+                }
+                */
+                
+            } // for
+
+        } // SetOnClickAttrValue(button)
+        
+    </script>    
+
+
+    <script type="text/javascript" language="JavaScript">
+        // !!! скрипт расположить в конце страницы - чтобы выполнялся после формирования контролов !!!
+        
+        function setOnClientClick() {
+            //--- работает:
+            //document.getElementById( "GridView1_ctl02_ckbDeny" ).setAttribute( "onClick", "javascript: Boo2('QQQ');" );
+
+            //document.getElementById( "GridView1_ctl02_ckbDeny" ).setAttribute( "onClick", "javascript: Boo2('" + 
+            //        document.getElementById( "GridView1_ctl02_ckbDeny" ).getAttribute("onClick", 2)
+            //+ "');" );
+            
+            alert("Выхвали !");
+            
+        	var str;
+        	var str2;
+            var ind;
+            var idElem;
+        	var elems = document.getElementsByTagName('*');
+        	//alert("Элементов: " + elems.length)
+            var bRavno = false;
+            var bRavno1 = false;
+            var bRavno2 = false;
+            for(var i=0; i < elems.length; i++)
+            {
+                idElem = elems[i].getAttribute('id');
+                idType = elems[i].getAttribute('type');
+                idName = elems[i].getAttribute('name');
+                if (idName != null)
+                {
+
+                   bRavno1 = (idElem.substr(idElem.length - 8) == "ckbAllow");
+                   bRavno2 = (idElem.substr(idElem.length - 7) == "ckbDeny");
+                   if ((idName == "cbxUserName") || (idName == "cbxAction") ||
+                       (idName == "btnAddUser") || (idName == "btnDelUser") ||
+                       (idName == "btnSave") || (idName == "btnCancel") ||
+                       (idName == "btnSaveNew") || (idName == "btnCancelNew") ||
+                       bRavno1 || bRavno2 || idName == "txtUserName")
+                   {
+                        //alert("idName = " + idName);
+		                str = elems[i].getAttribute("onClick", 0);
+		                if (str != null)
+		                {
+                            //alert("idName = " + idName);
+                            ind = str.indexOf(":");
+                            str2 = str.substring(0, ind+1) + "setBunload(false);" + str.substring(ind+1);
+                            //alert(str2);
+		                    elems[i].setAttribute("onClick", str2);
+		                }
+                   }
+                }
+            }
+        }    
+
+        setOnClientClick();
+        
     </script>
+
     
-
-
     
 </body>
 

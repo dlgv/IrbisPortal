@@ -2,5 +2,5 @@
 <appSettings>
   <logsDir>./logs</logsDir>
   <portNum>1240</portNum>
-  <permissionsFilePath>J:\VS2008.WRK\DLG_014_Irbis(IIS)\IrbisPortal\BotUAC\Xml\Permissions.xml</permissionsFilePath>
+  <permissionsFileName>Permissions.xml</permissionsFileName>
 </appSettings>

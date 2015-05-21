@@ -49,9 +49,51 @@ namespace BotUAC
             //Response.Write("Authentication: Authenticated = " + User.Identity.IsAuthenticated.ToString() + ", User = " + User.Identity.Name + ", Type = " + User.Identity.AuthenticationType);  
 
             // путь к файлу параметров приложения (Irbis.xml")
-            //string sMain = HttpContext.Current.Server.MapPath("~/App_Data");
+            //string sIrbisXmlFileNameFull = HttpContext.Current.Server.MapPath("~/App_Data");
             //string s2 = HostingEnvironment.ApplicationPhysicalPath;
-            string sMain = HttpContext.Current.Server.MapPath("~");         // косые в конце уже есть !!!
+            //string sIrbisXmlFileNameFull = HttpContext.Current.Server.MapPath("~");         // косые в конце уже есть !!!
+
+
+            // путь к файлу параметров приложения (Irbis.xml") из переменной файла web.config
+            // !!! при запуске формы из среды берется файл:
+            //     C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\Config\web.config"
+            //
+            string sIrbisXmlFileNameFull = null;
+            string sErr = null;
+            System.Configuration.Configuration rootWebConfig1 = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration(null);
+            if (rootWebConfig1.AppSettings.Settings.Count > 0)
+            {
+                //<appSettings>
+                //   <add key="irbisFileNameAndPath" value="с:\irbis\irbis.xml" />
+                //</appSettings>
+                System.Configuration.KeyValueConfigurationElement irbisFileNameAndPath = rootWebConfig1.AppSettings.Settings["irbisFileNameAndPath"];
+                if (irbisFileNameAndPath != null)
+                {
+                    sIrbisXmlFileNameFull = irbisFileNameAndPath.Value;
+                    if (sIrbisXmlFileNameFull.Trim().Length == 0)
+                    {
+                        sErr = TMess.Mess0019; // "In the web configuration is specified empty AppSettings.irbisFileNameAndPath";
+                    }
+                }
+                else
+                {
+                    sErr = TMess.Mess0018; // "In the web configuration is not specified AppSettings.irbisFileNameAndPath";
+                }
+            }
+            else
+            {   // нет ключей раздела appSettings (и когда нет вообще раздела appSettings)
+                sErr = TMess.Mess0017; // "In the web configuration is not specified AppSettings parameters";
+            }
+            if (sErr != null)
+            {
+                SayError(sErr);
+                appSet = null; // !!! как признак незагруженной - ПОСЛЕ вывода сообщения !!!
+                return; //======================>
+            }
+            // путь (без имеи) к файлу Irbis.xml - в этой же папке файл Permissions.xml
+            //string sIrbisXmlFilePath = Path.GetFullPath(sIrbisXmlFileNameFull);  // с косой в конце !!!
+            //string sPermissionsXmlFileNameFull = sIrbisXmlFilePath + "Permissions.xml";
+
 
             //---------------------------------------------------------------
             // первоначальная загрузка параметров Приложения и вычитка Объекта (по ИЛИ):
@@ -76,7 +118,7 @@ namespace BotUAC
             // вычитка из файла/сессии
             if (bNeedXmlAppLoad)
             {
-                appSet = new TAppSettings(sMain + "Irbis.xml");
+                appSet = new TAppSettings(sIrbisXmlFileNameFull);
                 if (!appSet.Load())
                 {
                     // "Error application config-file load: " + appSet.FileNameFull);
@@ -96,7 +138,7 @@ namespace BotUAC
             }
             if (bNeedXmlPerLoad)  // после загрузки для приложения !!!
             {
-                permSetOriginal = new TPermissionsSettings(appSet.PermissionsFilePath);  // после ЗАГРУЗКИ appSet !!!
+                permSetOriginal = new TPermissionsSettings(appSet.PermissionsFileNameAndPath);  // после ЗАГРУЗКИ appSet !!!
                 if (!permSetOriginal.Load())
                 {
                     // "Error permissions config-file load: " + permSetOriginal.FileNameFull); // "<br>" + 
@@ -135,6 +177,15 @@ namespace BotUAC
                 btnSave.ToolTip      = TMess.Mess0005; // "Save User";
                 btnCancelNew.ToolTip = TMess.Mess0008; // "Cancel add new User";
                 btnSaveNew.ToolTip   = TMess.Mess0007; // "Save new User";
+                btnSaveNew.ToolTip = TMess.Mess0007; // "Save new User";
+
+                btnAllow.ToolTip = TMess.Mess0015;  // "Change the values of all cells in the grid column";
+                btnDeny.ToolTip = TMess.Mess0015;   // "Change the values of all cells in the grid column";
+
+                // "заголовок" сетки жирным
+                lblExtension.Font.Bold = true;
+                btnAllow.Font.Bold = true;
+                btnDeny.Font.Bold = true;
 
                 // добавляем запрос у оператора при удалении пользователя
                 //<asp:ImageButton ID="btnDelUser" 
@@ -284,7 +335,7 @@ namespace BotUAC
             // выводим на экран все данные МОДИФИЦИРУЕМОГО пользователя
             RefreshScreenForUser();
             // активируем список имени
-            //cbxUserName.Focus();
+            cbxUserName.Focus();
 
             // восстанвливаем доступность кнопок в основном режимке
             SetUpdateScrMain(bUpdateScrMain);
@@ -326,8 +377,8 @@ namespace BotUAC
             RefreshScreenForUser();
             // доступность кнопок нового пользователя  - от заполненности имени 
             btnSaveNew.Enabled = (txtUserName.Text.Trim().Length > 0);
-            // активируем ввод имени
-            //txtUserName.Focus();
+            // активируем ввод имени !!!
+            txtUserName.Focus();
 
             // снимаеи признак измененности нового
             SetUpdateScrAdd(false);
@@ -379,7 +430,7 @@ namespace BotUAC
 
         //---------------------------------------------------
         // занесение нового (модифицируемого) пользователя с экрана в коллекцию
-        public bool UserAdd()
+        public bool UserAddToCollection()
         {
             bool bRet = false;
             string sErr = "";
@@ -416,8 +467,6 @@ namespace BotUAC
                 btnDelUser.Visible = true;
                 btnCancel.Visible = true;
                 btnSave.Visible = true;
-                // активируем список имени
-                //cbxUserName.Focus();
 
                 // добавляем новое имя в список имен пользователей 
                 cbxUserName.Items.Add(userModify.UserName);
@@ -457,7 +506,7 @@ namespace BotUAC
             }
             return bRet; //=======================>
 
-        } // UserAdd()
+        } // UserAddToCollection()
 
 
         //---------------------------------------------------
@@ -490,8 +539,19 @@ namespace BotUAC
                 // удаляем пользователя из объекта
                 permSetModify.Users.Drop(sUserName);
                 // удаляем пользователя из списка
-                cbxUserName.Items.Remove(sUserName);
-                cbxUserName.SelectedIndex = 0; // c 0 !
+                if (cbxUserName.Items.Count > 1)
+                {
+                    cbxUserName.Items.Remove(sUserName);
+                }
+                else  // последний элемент не удаляется обычным образом - просто чистим список !
+                {
+                    cbxUserName.Items.Clear();
+                }
+                // назначаем текущий в списке
+                if (cbxUserName.Items.Count > 0)
+                {
+                    cbxUserName.SelectedIndex = 0; // c 0 !
+                }
                 //Application.DoEvents();
                 // назначаем нового тек. пользователя
                 sUserName = cbxUserName.Text;
@@ -536,7 +596,14 @@ namespace BotUAC
             }
 
             // назначаем нового модифицируемого пользователя
-            userModify = permSetModify.Users.FindUser(UserName).Clone();  // должен быть !!!
+            if (UserName.Trim().Length > 0)
+            {
+                userModify = permSetModify.Users.FindUser(UserName).Clone();  // должен быть !!!
+            }
+            else
+            {
+                userModify = new TUser("", "", new TPermissions());
+            }
 
             // выводим на экран все данные МОДИФИЦИРУЕМОГО пользователя
             RefreshScreenForUser();
@@ -576,6 +643,28 @@ namespace BotUAC
                 // выводим на экран Разрешения (сетку) МОДИФИЦИРУЕМОГО пользователя
                 RefreshScreenForPermissions();
 
+                // доступность кнопки Удаления пользователя
+                btnDelUser.Enabled = (cbxUserName.Text.Trim() != "");
+
+                //-------------------------------------
+                // рзрешаем / запрещаем дедактирование (нельзя, если нет пользовтелей - пустой выпадающий список!)
+                bool bEnabled = ((cbxUserName.Visible && cbxUserName.Text.Trim() != "") || (txtUserName.Visible));
+                cbxUserName.Enabled = bEnabled;
+                cbxAction.Enabled = bEnabled;
+                btnAllow.Enabled = bEnabled;
+                btnDeny.Enabled = bEnabled;
+                // сетка
+                foreach (GridViewRow row in GridView1.Rows)
+                {
+                    if (row.RowType == DataControlRowType.DataRow)
+                    {
+                        CheckBox ckb;
+                        ckb = (row.Cells[nColUserAllow].FindControl("ckbAllow") as CheckBox);
+                        ckb.Enabled = bEnabled;
+                        ckb = (row.Cells[nColUserAllow].FindControl("ckbDeny") as CheckBox);
+                        ckb.Enabled = bEnabled;
+                    }
+                } // по строкам сетки
             }
         }  // RefreshScreenForUser()
 
@@ -767,6 +856,10 @@ namespace BotUAC
 
             // назначаем нового текущего пользователя
             UserModifySet(cbxUserName.Text, false);  // false - НЕ полсе удаления !!!
+
+            // доступность кнопки Удаления рользователя
+            btnDelUser.Enabled = (cbxUserName.Text.Trim() != "");
+
         }
 
         protected void btnAllow_Click(object sender, EventArgs e)
@@ -871,6 +964,7 @@ namespace BotUAC
 
         protected void CheckBox1_CheckedChanged(object sender, EventArgs e)
         {
+            // обработка события для чекбокса в колонке сетки (ckbAllow и ckbDeny) 
             if (txtUserName.Visible)
             {
                 SetUpdateScrAdd(true);
@@ -901,14 +995,8 @@ namespace BotUAC
         // удаление пользователя (из списка и из файла)
         private void UserRemove()
         {
-            if (cbxUserName.Items.Count < 2)
-            {
-                //MessageBox.Show(cbxUserName + "  is the last user in the list !", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                return; //===========>
-            }
-            //if (MessageBox.Show("Remove user " + cbxUserName.Text + " ?" + Environment.NewLine +
-            //    Environment.NewLine + "Recovery will be impossible !", this.Text, MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) != DialogResult.Yes)
-            //    return; //===========>
+            // проверки
+            // ...
 
             // само удаление старого пользователя
             UserDel();   
@@ -1138,7 +1226,10 @@ namespace BotUAC
                 // переносим текущее состояние пользователя c экрана в объект-модификации (если не сменили на экране пользователя !)
                 UserApply();  // берем Роль и Разрешения сетки с экрана в модифицируемого 
                 // сохраняем в Объекте модифицированного пользователя (заменяем - уже должен быть в коллекции, и для нового!)
-                permSetModify.Users.Set(userModify.Clone());
+                if (userModify.UserName.Trim() != "")  // !!! с пустым именем будет после удаления последнего в списке !!!
+                {
+                    permSetModify.Users.Set(userModify.Clone());
+                }
                 // берем список пользователей из Коллекции (объекта)
                 TUsers newUsers = permSetModify.Users;
 
@@ -1268,12 +1359,12 @@ namespace BotUAC
                 }
                 cbxUserName.SelectedIndex = nSetIndex; // c 0 !?
             }
-            if (cbxUserName.Items.Count == 0)  // не должно быть
-            {
-                //Response.Write("Error permissions config-file - empty Users list: " + permSetModify.FileNameFull); // "<br>" + 
-                Response.Write(TMess.Mess0009 + " " + permSetModify.FileNameFull); // "<br>" + 
-                return; //======================>
-            }
+            //if (cbxUserName.Items.Count == 0) - считается допустимым !
+            //{
+            //    //Response.Write("Error permissions config-file - empty Users list: " + permSetModify.FileNameFull); // "<br>" + 
+            //    Response.Write(TMess.Mess0009 + " " + permSetModify.FileNameFull); // "<br>" + 
+            //    return; //======================>
+            //}
 
             // Операции - заполняем выпадаюший список
             cbxAction.Items.Clear();
@@ -1297,8 +1388,8 @@ namespace BotUAC
             }
             if (cbxAction.Items.Count == 0)  // не должно быть
             {
-                //Response.Write("Error permissions config-file - empty Actionы list: " + permSetModify.FileNameFull); // "<br>" + 
-                Response.Write(TMess.Mess0010 + " " + permSetModify.FileNameFull); // "<br>" + 
+                //SayError(("Error permissions config-file - empty Actionы list: " + permSetModify.FileNameFull); 
+                SayError(TMess.Mess0010 + " " + permSetModify.FileNameFull);
                 return; //======================>
             }
 
@@ -1325,7 +1416,7 @@ namespace BotUAC
             UserApply();  // берем Роль и Разрешения сетки с экрана в модифицируемого 
 
             // занесение нового (модифицируемого) пользователя с экрана в коллекцию
-            UserAdd();
+            UserAddToCollection();
         }
 
 

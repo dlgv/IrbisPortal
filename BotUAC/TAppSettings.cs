@@ -17,26 +17,29 @@ namespace BotUAC
 
         private int portNum;        
         private string logsDir;
-        private string permissionsFilePath;
+        private string permissionsFileNameAndPath;
+        private string permissionsFileNameOnly;
         // вспомогательные:
         private string fileName;
         private string fileNameFull;
         private string message;
 
         //-----------------------------------------------------------------
-        public TAppSettings(string FileName)  // конструктор  (для структуры нельзя без прараметров !!!)
+        public TAppSettings(string FileNameFull)  // конструктор  (для структуры нельзя без прараметров !!!)
         {
             logsDir = "";
-            permissionsFilePath = "";
+            permissionsFileNameAndPath = "";
+            permissionsFileNameOnly = "";
             portNum = -1;
-            fileName = FileName;
-            fileNameFull = "";
+            fileName = "";
+            fileNameFull = FileNameFull;
             message = "";
         }
         // свойства
         public int PortNum { get { return portNum; } }
         public string LogsDir { get { return logsDir; } }
-        public string PermissionsFilePath { get { return permissionsFilePath; } }
+        public string PermissionsFileNameAndPath { get { return permissionsFileNameAndPath; } }
+        public string PermissionsFileNameOnly { get { return permissionsFileNameOnly; } }
         // вспомогательные:
         public string FileName { get { return fileName; } }
         public string FileNameFull { get { return fileNameFull; } }
@@ -61,24 +64,30 @@ namespace BotUAC
             //string sXmlFile = "Irbis.xml";
 
             ////  c:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\bin
-            //string sXmlFilepath = ".\\bin\\" + this.fileName;   // в ТЕКУЩЕЙ папке (брать из папки с .EXE ????)
+            //string sXmlFilePath = ".\\bin\\" + this.fileName;   // в ТЕКУЩЕЙ папке (брать из папки с .EXE ????)
+            //string sXmlFilePath = HttpContext.Current.Server.MapPath("~/bin~/") + this.fileName;   // в ТЕКУЩЕЙ папке (брать из папки с .EXE ????)
 
-            //string sXmlFilepath = HttpContext.Current.Server.MapPath("~/bin~/") + this.fileName;   // в ТЕКУЩЕЙ папке (брать из папки с .EXE ????)
+            string sXmlFilePath = null;
+            //string sXmlFileNameFull = "";
 
-            string sXmlFilepath = this.fileName;   //  !!! уже с путем (для универсальности классов !)
-
-            string sXmlFileNameFull = "";
             FileStream fs = null;
 
             try
             {
-                sXmlFileNameFull = Path.GetFullPath(sXmlFilepath);  // с косой в конце !!!
+                /*
+                - !!! готовоеимя с ПУТЕМ взяли из web.config !!!
+                sXmlFilePath = this.fileName;   //  !!! уже с путем (для универсальности классов !)
+                sXmlFileNameFull = Path.GetFullPath(sXmlFilePath);  // с косой в конце !!!
                 if (sXmlFileNameFull.Substring(sXmlFileNameFull.Length - 1, 1) == "\\")
                 {
                     sXmlFileNameFull = sXmlFileNameFull.Substring(0, sXmlFileNameFull.Length - 2); // отрезали косую в конце! 
                 }
                 // в свойства класса AppSetting (потом можно забтрать из объекта)
                 this.fileNameFull = sXmlFileNameFull;
+                */
+
+                //sXmlFilePath = Path.GetFullPath(fileNameFull);  // полное имя с путем !!!
+                sXmlFilePath = Path.GetDirectoryName(fileNameFull);  // !!! без косых в конце "c:\\irbis"
 
                 // проверяем наличие файла
                 if (!File.Exists(this.fileNameFull))
@@ -101,8 +110,8 @@ namespace BotUAC
                             this.logsDir = nodeMain.InnerText.Trim();
                             break; //------->
 
-                        case "PERMISSIONSFILEPATH":
-                            this.permissionsFilePath = nodeMain.InnerText.Trim();
+                        case "PERMISSIONSFILENAME":
+                            this.permissionsFileNameOnly = nodeMain.InnerText.Trim();
                             break; //------->
 
                         case "PORTNUM":
@@ -114,7 +123,10 @@ namespace BotUAC
                 // проверяем наличие атрибутов в файле инициализации
                 if (this.PortNum == -1) throw new TException("Value \"this.portNum\" does not exist");  //====>
                 if (this.LogsDir == null) throw new TException("Value \"this.pogsDir\" does not exist");  //====>
-                if (this.PermissionsFilePath == null) throw new TException("Value \"this.permissionsFilePath\" does not exist");  //====>
+                if (this.PermissionsFileNameOnly == null) throw new TException("Value \"this.PermissionsFileNameOnly\" does not exist");  //====>
+
+                // файл разрешений в той же папке, что и Irbis.xml - добавляем путь к вычитанному имеи
+                this.permissionsFileNameAndPath = sXmlFilePath  + "\\" + this.permissionsFileNameOnly;
 
                 // нормально загрузили параметры прилоежения
                 bRet = true;
