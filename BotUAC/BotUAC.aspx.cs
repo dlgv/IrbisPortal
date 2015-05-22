@@ -60,7 +60,12 @@ namespace BotUAC
             //
             string sIrbisXmlFileNameFull = null;
             string sErr = null;
+
+            /*
+            //-------------------------------------------------------------
+            // из глобального файла сервера (web.config) 
             System.Configuration.Configuration rootWebConfig1 = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration(null);
+            System.Configuration.Configuration rootWebConfig1 = System.Configuration.ConfigurationManager.OpenExeConfiguration(null);
             if (rootWebConfig1.AppSettings.Settings.Count > 0)
             {
                 //<appSettings>
@@ -83,6 +88,29 @@ namespace BotUAC
             else
             {   // нет ключей раздела appSettings (и когда нет вообще раздела appSettings)
                 sErr = TMess.Mess0017; // "In the web configuration is not specified AppSettings parameters";
+            }
+            if (sErr != null)
+            {
+                SayError(sErr);
+                appSet = null; // !!! как признак незагруженной - ПОСЛЕ вывода сообщения !!!
+                return; //======================>
+            }
+            //-------------------------------------------------------------
+            */
+
+            //-------------------------------------------------------------
+            // из локального файла приложения (web.config) 
+            sIrbisXmlFileNameFull = System.Configuration.ConfigurationManager.AppSettings["irbisFileNameAndPath"];
+            if (sIrbisXmlFileNameFull != null)
+            {
+                if (sIrbisXmlFileNameFull.Trim().Length == 0)
+                {
+                    sErr = TMess.Mess0019; // "In the web configuration is specified empty AppSettings.irbisFileNameAndPath";
+                }
+            }
+            else
+            {
+                sErr = TMess.Mess0018; // "In the web configuration is not specified AppSettings.irbisFileNameAndPath";
             }
             if (sErr != null)
             {

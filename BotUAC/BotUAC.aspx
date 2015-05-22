@@ -92,8 +92,9 @@
                         BorderStyle="None" onclick="btnDeny_Click" />
                     
                         
-                        
-                <div style="position:absolute; overflow:scroll; height: 342px; top: 30px; left: -1px; width: 347px; border: 1px solid #000;">
+                <div style="position:absolute; overflow:auto; height: 342px; top: 30px; left: -1px; width: 347px; border: 1px solid #000;">
+                    <!-- overflow:scroll - скроллбары постоянно, даже, если сетка помечается -->                        
+                    <!-- overflow:auto - скроллбары динамически появля.ются от размеров сетки -->                        
 
                     <asp:GridView ID="GridView1"  
                         CellPadding="5" CellSpacing="2"  AutoGenerateColumns="False"
