@@ -76,7 +76,8 @@
                 </asp:DropDownList>
                 
             <asp:Panel ID="Panel1" style="position:absolute; border: 1px solid #000; 
-                top: 112px; left: 18px; height: 372px; width: 347px;" runat="server" >
+                top: 112px; left: 18px; height: 665px; width: 347px;" runat="server" >
+                <!-- панель для рамочки под "шапкой" сетки -->                        
                 
                 <asp:Label ID="lblExtension"  Text="Extension" 
                     style="position: absolute; top: 5px; left: 10px; width: 49px;"  runat="server" ></asp:Label>
@@ -92,7 +93,7 @@
                         BorderStyle="None" onclick="btnDeny_Click" />
                     
                         
-                <div style="position:absolute; overflow:auto; height: 342px; top: 30px; left: -1px; width: 347px; border: 1px solid #000;">
+                <div style="position:absolute; overflow:auto; height: 635px; top: 30px; left: -1px; width: 347px; border: 1px solid #000;">
                     <!-- overflow:scroll - скроллбары постоянно, даже, если сетка помечается -->                        
                     <!-- overflow:auto - скроллбары динамически появля.ются от размеров сетки -->                        
 
@@ -158,22 +159,22 @@
             </asp:Panel>
 
             <asp:Button ID="btnCancelNew" runat="server" Text="Cancel New" 
-                style="position:absolute; top: 496px; left: 176px; width: 92px;" 
+                style="position:absolute; top: 790px; left: 176px; width: 92px;" 
                 onclick="btnCancelNew_Click" Visible="False" />
                   
             <asp:Button ID="btnSaveNew" runat="server" Text="Save New" 
-                style="position:absolute; top: 496px; left: 270px; width: 92px; right: 391px;" 
+                style="position:absolute; top: 790px; left: 270px; width: 92px; right: 391px;" 
                 OnClientClick="setOnBeforeUnload(false)"
                 onclick="btnSaveNew_Click" Visible="False" />
                     
 
             <asp:Button ID="btnCancel" runat="server" Text="Cancel" 
-                style="position:absolute; top: 496px; left: 176px; width: 92px;" 
+                style="position:absolute; top: 790px; left: 176px; width: 92px;" 
                 OnClientClick="setOnBeforeUnload(false)"
                 onclick="btnCancel_Click" />
                     
             <asp:Button ID="btnSave" runat="server" Text="Save" 
-                style="position:absolute; top: 496px; left: 270px; width: 92px; right: 391px;" 
+                style="position:absolute; top: 790px; left: 270px; width: 92px; right: 391px;" 
                 onclick="btnSave_Click"  />
 
             <!--

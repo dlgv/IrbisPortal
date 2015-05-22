@@ -16,6 +16,7 @@ using System.IO;                    // для FileStream
 using System.Xml;
 using System.Collections.Generic;   // List<>
 using System.Diagnostics;           // Process (Stfrt / Kill)
+using System.Threading;             // Events? Mutex
 
 namespace BotUAC   
 {
@@ -1237,6 +1238,7 @@ namespace BotUAC
         {
             bool bRet = false;
             string sErr = "";
+
             try
             {
                 if (permSetModify == null)  // не должно быть !!!
@@ -1278,29 +1280,23 @@ namespace BotUAC
                 docNew.Root.Add(newUsers.ToXElement());
 
                 //======================
-                // сохраняем откоректирванный документ в файле
-                try
+                // сохраняем откоректирванный документ в файле (с перезапуском процесса)
+                string Message = null;
+                if (WriteChangesToXMLFileAndRestart(docNew, permSetModify.FileNameFull, out Message))
                 {
-                    docNew.Save(permSetModify.FileNameFull);
-                    bUpdateXmlFile_to_RestartProc = true;    // для перезапуска заданного процесса при завершении работы с формой
-                    //MessageBox.Show("File saved." + Environment.NewLine +
-                    //     Environment.NewLine + permSetModify.FileNameFull + "_new", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    // назначаем текущую коллекцию оригинальной (откат будет уже к ней)
+                    permSetOriginal = permSetModify.Clone();
+                    // снимаем признак измененности коллекции 
+                    SetUpdateScrMain(false);
                 }
-                catch (Exception ex)
+                else
                 {
-                    sErr = sErr + (sErr == "" ? "" : " // ") + ex.Message;
-                    //MessageBox.Show("File not saved." + Environment.NewLine +
-                    //     Environment.NewLine + permSetModify.FileNameFull + "_new" + Environment.NewLine +
-                    //     Environment.NewLine + "Error: " + ex.Message, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    if (Message != "")
+                    {
+                        sErr = sErr + (sErr == "" ? "" : " // ") + Message;
+                    }
                 }
                 //======================
-
-                // назначаем текущую коллекцию оригинальной (откат будет уже к ней)
-                permSetOriginal = permSetModify.Clone();
-
-                // снимаем признак измененности коллекции 
-                SetUpdateScrMain(false);
-
             }
             catch (Exception e)
             {
@@ -1316,6 +1312,7 @@ namespace BotUAC
             {
                 message = sErr;
             }
+
             return bRet; //=======================>
 
         } // UsersSave()
@@ -1445,6 +1442,58 @@ namespace BotUAC
 
             // занесение нового (модифицируемого) пользователя с экрана в коллекцию
             UserAddToCollection();
+        }
+
+
+        //------------------------------------------------------------------
+        // сохранение документа в файле, перезапуск процесса через событие
+        //   BotUAC  - клиент (испльзуем существующее событие, если оно есть)
+        //   Process - сервер (создает событие)
+        // 
+        public bool WriteChangesToXMLFileAndRestart(XDocument docNew, string FileNameFull, out string Message)
+        {
+            bool bFileSaved = false;
+            bool bEventExist = false;
+            Message = "";
+            try
+            {
+                // готовим событие
+                string sEventName = appSet.EventName;
+                string sMutexName = appSet.MutexName;
+                EventWaitHandle eventUpdFile;
+                Mutex mutexUpdFile;
+                // открываем именованое событие (поцесс его должен был создать!)
+                eventUpdFile = EventWaitHandle.OpenExisting(sEventName);
+                bEventExist = true;
+                // ждем Mutex
+                mutexUpdFile = Mutex.OpenExisting(sMutexName);
+                mutexUpdFile.WaitOne();
+                {
+                    //------------------------------------
+                    // сохраняем документ в файле с генерацией события
+                    docNew.Save(permSetModify.FileNameFull);
+                    bFileSaved = true;
+                    //------------------------------------
+                }
+                mutexUpdFile.ReleaseMutex();
+                // дергаем событие
+                eventUpdFile.Set();
+            }
+            catch (Exception ex)
+            {
+                Message = ex.Message;
+            }
+            // процесса (события) может  не быть - тогда просто сохраняем в файле
+            if (!bEventExist)  
+            {
+                //------------------------------------
+                // сохраняем документ в файле с генерацией события
+                docNew.Save(permSetModify.FileNameFull);
+                bFileSaved = true;
+                //------------------------------------
+            }
+            // результат
+            return bFileSaved; //===============>
         }
 
 

@@ -17,6 +17,8 @@ namespace BotUAC
 
         private int portNum;        
         private string logsDir;
+        private string eventName;
+        private string mutexName;
         private string permissionsFileNameAndPath;
         private string permissionsFileNameOnly;
         // вспомогательные:
@@ -28,6 +30,8 @@ namespace BotUAC
         public TAppSettings(string FileNameFull)  // конструктор  (для структуры нельзя без прараметров !!!)
         {
             logsDir = "";
+            eventName = "";
+            mutexName = "";
             permissionsFileNameAndPath = "";
             permissionsFileNameOnly = "";
             portNum = -1;
@@ -38,6 +42,8 @@ namespace BotUAC
         // свойства
         public int PortNum { get { return portNum; } }
         public string LogsDir { get { return logsDir; } }
+        public string EventName { get { return eventName; } }
+        public string MutexName { get { return mutexName; } }
         public string PermissionsFileNameAndPath { get { return permissionsFileNameAndPath; } }
         public string PermissionsFileNameOnly { get { return permissionsFileNameOnly; } }
         // вспомогательные:
@@ -110,6 +116,14 @@ namespace BotUAC
                             this.logsDir = nodeMain.InnerText.Trim();
                             break; //------->
 
+                        case "EVENTNAME":
+                            this.eventName = nodeMain.InnerText.Trim();
+                            break; //------->
+
+                        case "MUTEXNAME":
+                            this.mutexName = nodeMain.InnerText.Trim();
+                            break; //------->
+
                         case "PERMISSIONSFILENAME":
                             this.permissionsFileNameOnly = nodeMain.InnerText.Trim();
                             break; //------->
@@ -123,6 +137,8 @@ namespace BotUAC
                 // проверяем наличие атрибутов в файле инициализации
                 if (this.PortNum == -1) throw new TException("Value \"this.portNum\" does not exist");  //====>
                 if (this.LogsDir == null) throw new TException("Value \"this.pogsDir\" does not exist");  //====>
+                if (this.EventName == null) throw new TException("Value \"this.eventName\" does not exist");  //====>
+                if (this.MutexName == null) throw new TException("Value \"this.mutexName\" does not exist");  //====>
                 if (this.PermissionsFileNameOnly == null) throw new TException("Value \"this.PermissionsFileNameOnly\" does not exist");  //====>
 
                 // файл разрешений в той же папке, что и Irbis.xml - добавляем путь к вычитанному имеи

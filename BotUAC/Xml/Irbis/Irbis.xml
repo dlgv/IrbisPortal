@@ -3,4 +3,6 @@
   <logsDir>./logs</logsDir>
   <portNum>1240</portNum>
   <permissionsFileName>Permissions.xml</permissionsFileName>
+  <eventName>Global\Irbis.Event.PermissionsChanged</eventName>
+  <mutexName>Global\Irbis.Mutex.PermissionsChanged</mutexName>
 </appSettings>
