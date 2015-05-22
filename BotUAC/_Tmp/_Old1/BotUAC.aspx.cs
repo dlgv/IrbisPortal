@@ -16,7 +16,6 @@ using System.IO;                    // для FileStream
 using System.Xml;
 using System.Collections.Generic;   // List<>
 using System.Diagnostics;           // Process (Stfrt / Kill)
-using System.Threading;             // Events? Mutex
 
 namespace BotUAC   
 {
@@ -29,7 +28,9 @@ namespace BotUAC
         private TPermissionsSettings permSetOriginal = null;    // Первоначальная коллекция для Undo (вычитанная из файла или сохраненная в файле)
         private TPermissionsSettings permSetModify = null;      // Корректируемая коллекция
 
+        private TUser userCurrent = null;   // указатель в общем списке (первоначальные данные)
         private TUser userModify = null;    // копия корректируемая
+        private TUser userCurrentBeforeAdd = null;   // \  на момент добавления нового пользователя
         private TUser userModifyBeforeAdd = null;    // /
 
         private string sActionModify = null;    // копия имени корректируемой акции (текущей в выпадающем списке)
@@ -38,8 +39,7 @@ namespace BotUAC
 
         private List<PermRow> GridData = new List<PermRow>();
 
-        bool bUpdateScrMain = false;
-        bool bUpdateScrAdd = false;
+        bool bUpdateScr = false;
         string message = null;
 
 
@@ -50,79 +50,9 @@ namespace BotUAC
             //Response.Write("Authentication: Authenticated = " + User.Identity.IsAuthenticated.ToString() + ", User = " + User.Identity.Name + ", Type = " + User.Identity.AuthenticationType);  
 
             // путь к файлу параметров приложения (Irbis.xml")
-            //string sIrbisXmlFileNameFull = HttpContext.Current.Server.MapPath("~/App_Data");
+            //string sMain = HttpContext.Current.Server.MapPath("~/App_Data");
             //string s2 = HostingEnvironment.ApplicationPhysicalPath;
-            //string sIrbisXmlFileNameFull = HttpContext.Current.Server.MapPath("~");         // косые в конце уже есть !!!
-
-
-            // путь к файлу параметров приложения (Irbis.xml") из переменной файла web.config
-            // !!! при запуске формы из среды берется файл:
-            //     C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\Config\web.config"
-            //
-            string sIrbisXmlFileNameFull = null;
-            string sErr = null;
-
-            /*
-            //-------------------------------------------------------------
-            // из глобального файла сервера (web.config) 
-            System.Configuration.Configuration rootWebConfig1 = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration(null);
-            System.Configuration.Configuration rootWebConfig1 = System.Configuration.ConfigurationManager.OpenExeConfiguration(null);
-            if (rootWebConfig1.AppSettings.Settings.Count > 0)
-            {
-                //<appSettings>
-                //   <add key="irbisFileNameAndPath" value="с:\irbis\irbis.xml" />
-                //</appSettings>
-                System.Configuration.KeyValueConfigurationElement irbisFileNameAndPath = rootWebConfig1.AppSettings.Settings["irbisFileNameAndPath"];
-                if (irbisFileNameAndPath != null)
-                {
-                    sIrbisXmlFileNameFull = irbisFileNameAndPath.Value;
-                    if (sIrbisXmlFileNameFull.Trim().Length == 0)
-                    {
-                        sErr = TMess.Mess0019; // "In the web configuration is specified empty AppSettings.irbisFileNameAndPath";
-                    }
-                }
-                else
-                {
-                    sErr = TMess.Mess0018; // "In the web configuration is not specified AppSettings.irbisFileNameAndPath";
-                }
-            }
-            else
-            {   // нет ключей раздела appSettings (и когда нет вообще раздела appSettings)
-                sErr = TMess.Mess0017; // "In the web configuration is not specified AppSettings parameters";
-            }
-            if (sErr != null)
-            {
-                SayError(sErr);
-                appSet = null; // !!! как признак незагруженной - ПОСЛЕ вывода сообщения !!!
-                return; //======================>
-            }
-            //-------------------------------------------------------------
-            */
-
-            //-------------------------------------------------------------
-            // из локального файла приложения (web.config) 
-            sIrbisXmlFileNameFull = System.Configuration.ConfigurationManager.AppSettings["irbisFileNameAndPath"];
-            if (sIrbisXmlFileNameFull != null)
-            {
-                if (sIrbisXmlFileNameFull.Trim().Length == 0)
-                {
-                    sErr = TMess.Mess0019; // "In the web configuration is specified empty AppSettings.irbisFileNameAndPath";
-                }
-            }
-            else
-            {
-                sErr = TMess.Mess0018; // "In the web configuration is not specified AppSettings.irbisFileNameAndPath";
-            }
-            if (sErr != null)
-            {
-                SayError(sErr);
-                appSet = null; // !!! как признак незагруженной - ПОСЛЕ вывода сообщения !!!
-                return; //======================>
-            }
-            // путь (без имеи) к файлу Irbis.xml - в этой же папке файл Permissions.xml
-            //string sIrbisXmlFilePath = Path.GetFullPath(sIrbisXmlFileNameFull);  // с косой в конце !!!
-            //string sPermissionsXmlFileNameFull = sIrbisXmlFilePath + "Permissions.xml";
-
+            string sMain = HttpContext.Current.Server.MapPath("~");         // косые в конце уже есть !!!
 
             //---------------------------------------------------------------
             // первоначальная загрузка параметров Приложения и вычитка Объекта (по ИЛИ):
@@ -147,7 +77,7 @@ namespace BotUAC
             // вычитка из файла/сессии
             if (bNeedXmlAppLoad)
             {
-                appSet = new TAppSettings(sIrbisXmlFileNameFull);
+                appSet = new TAppSettings(sMain + "Irbis.xml");
                 if (!appSet.Load())
                 {
                     // "Error application config-file load: " + appSet.FileNameFull);
@@ -167,7 +97,7 @@ namespace BotUAC
             }
             if (bNeedXmlPerLoad)  // после загрузки для приложения !!!
             {
-                permSetOriginal = new TPermissionsSettings(appSet.PermissionsFileNameAndPath);  // после ЗАГРУЗКИ appSet !!!
+                permSetOriginal = new TPermissionsSettings(appSet.PermissionsFilePath);  // после ЗАГРУЗКИ appSet !!!
                 if (!permSetOriginal.Load())
                 {
                     // "Error permissions config-file load: " + permSetOriginal.FileNameFull); // "<br>" + 
@@ -206,94 +136,153 @@ namespace BotUAC
                 btnSave.ToolTip      = TMess.Mess0005; // "Save User";
                 btnCancelNew.ToolTip = TMess.Mess0008; // "Cancel add new User";
                 btnSaveNew.ToolTip   = TMess.Mess0007; // "Save new User";
-                btnSaveNew.ToolTip = TMess.Mess0007; // "Save new User";
 
-                btnAllow.ToolTip = TMess.Mess0015;  // "Change the values of all cells in the grid column";
-                btnDeny.ToolTip = TMess.Mess0015;   // "Change the values of all cells in the grid column";
+                // свойства контролов по умолчанию
+                txtUserName.Visible = false;
+                lblUserName_Error.Visible = false;
 
-                // "заголовок" сетки жирным
-                lblExtension.Font.Bold = true;
-                btnAllow.Font.Bold = true;
-                btnDeny.Font.Bold = true;
+                btnCancelNew.Visible = false;
+                btnSaveNew.Visible = false;
 
-                // добавляем запрос у оператора при удалении пользователя
-                //<asp:ImageButton ID="btnDelUser" 
-                //    onClientClick="return confirm('Are you sure you want to delete the user?')"
-                //    onclick="btnDelUser_Click" />
-                //btnDelUser.OnClientClick = "return confirm('" + "Are you sure you want to delete the user?" + "')";
-                btnDelUser.OnClientClick = "return confirm('" + TMess.Mess0014 + "')";
+                btnCancel.Text = "Undo";
+                btnSave.Text = "Save";
 
+                btnCancelNew.Text = "Cancel";
+                btnSaveNew.Text = "Add";
 
-                //==========================
-                // начальная установка (первая загрузка формы) пользователя для его коррекции
-                UserSetBegin("", "");   // "" - имя пользователя для позиционирования (при пустом - первый по алфавитному списку)
+                // UserName - выпадаюший список
+                cbxUserName.Items.Clear();
+                foreach (TUser user in permSetModify.Users)
+                {
+                    cbxUserName.Items.Add(user.UserName);
+                }
+                // сортируем элементы списка Имен
+                SortCbxItems(cbxUserName);
+
+                /*
+                // работает:
+                List<string> aTmp = new List<string>();
+                foreach (TUser user in permSetModify.Users)
+                {
+                    aTmp.Add(user.UserName);
+                }
+                aTmp.Sort();
+                foreach (string str in aTmp)
+                {
+                    cbxUserName.Items.Add(str);
+                }
+                */ 
+                  
+                if (cbxUserName.Items.Count > 0)  // на первый элемент списка
+                {
+                    cbxUserName.SelectedIndex = 0; // c 0 !?
+                }
+                if (cbxUserName.Items.Count == 0)  // не должно быть
+                {
+                    //Response.Write("Error permissions config-file - empty Users list: " + permSetModify.FileNameFull); // "<br>" + 
+                    Response.Write(TMess.Mess0009 + " " + permSetModify.FileNameFull); // "<br>" + 
+                    return; //======================>
+                }
+
+                // Операции - выпадаюший список
+                cbxAction.Items.Clear();
+                foreach (TAction act in permSetModify.Actions)
+                {
+                    cbxAction.Items.Add(act.ActionName);
+                }
+                if (cbxAction.Items.Count > 0)  // на первый элемент списка
+                {
+                    cbxAction.SelectedIndex = 0; // c 0 !?
+                    sActionModify = cbxAction.Text;   // !!! надо здесь - не срабатывает событие смены индекса !!!
+                }
+                if (cbxAction.Items.Count == 0)  // не должно быть
+                {
+                    //Response.Write("Error permissions config-file - empty Actionы list: " + permSetModify.FileNameFull); // "<br>" + 
+                    Response.Write(TMess.Mess0010 + " " + permSetModify.FileNameFull); // "<br>" + 
+                    return; //======================>
+                }
+
+                // Разрешения - строки сетки
+                PermRow permRow;
+                foreach (TExtension ext in permSetModify.Extensions) // добавляем строки в сетку
+                {
+                    permRow = new PermRow(ext.ExtensionId, ext.ExtensionName, false, false);
+                    this.GridData.Add(permRow);
+                }
+                GridView1.DataSource = this.GridData;
+                GridView1.DataBind();
+
+                // обновляем данные на экране для нового тек. пользователя, назначаем modify !
+                UserSet(cbxUserName.Text);
 
 
                 //----------------------------------------
-                // первоначальная загрузка - сохраняем переменные формы для след.загрузки !!!
+                // сохраняем переменные формы для след.загрузки !!!
                 // !!! сбой при вычитке после потери сеиии по таймауту !!!
                 Session["permSetOriginal"] = permSetOriginal;
                 Session["permSetModify"] = permSetModify;
+                Session["userCurrent"] = userCurrent;
                 Session["userModify"] = userModify;
+                Session["userCurrentBeforeAdd"] = userCurrentBeforeAdd;
                 Session["userModifyBeforeAdd"] = userModifyBeforeAdd;
                 Session["sActionModify"] = sActionModify;
                 Session["bUpdateXmlFile_to_RestartProc"] = bUpdateXmlFile_to_RestartProc;
-                Session["bUpdateScrMain"] = bUpdateScrMain;
-                Session["bUpdateScrAdd"] = bUpdateScrAdd;
+                Session["bUpdateScr"] = bUpdateScr;
                 Session["message"] = message;
 
+                //ViewState.Add("userCurrent", userCurrent);
                 //ViewState.Add("userModify", userModify);
                 //ViewState.Add("sActionModify", sActionModify);
                 //ViewState.Add("bUpdateXmlFile_to_RestartProc", bUpdateXmlFile_to_RestartProc);
-                //ViewState.Add("bUpdateScrMain", bUpdateScrMain);
+                //ViewState.Add("bUpdateScr", bUpdateScr);
                 //ViewState.Add("message", message);
 
                 // восстанавливаем состояние кнопок (после восстановлеиня из формы!)
-                SetUpdateScrMain(bUpdateScrMain);
-                SetUpdateScrAdd(bUpdateScrAdd);
+                SetUpdateScr(bUpdateScr);
 
             }
             else  // не первая загрузка страницы
             {
                 //----------------------------------------
-                // повторная загрузка - восстанавливаем переменные формы от предыд.загрузки !!!
+                // восстанавливаем переменные формы от предыд.загрузки !!!
                 // !!! сбой при вычитке после потери сеиии по таймауту !!!
-                // !!! проверять "userModify" - он всегда ен null !!!
-                if (Session["userModify"] == null)   // сессия закрылась по таймауту - просто берем текущие ?
+                if (Session["userCurrent"] == null)   // сессия закрылась по таймауту - просто берем текущие ?
                 {
                     Session["permSetOriginal"] = permSetOriginal;
                     Session["permSetModify"] = permSetModify;
+                    Session["userCurrent"] = userCurrent;
                     Session["userModify"] = userModify;
+                    Session["userCurrentBeforeAdd"] = userCurrentBeforeAdd;
                     Session["userModifyBeforeAdd"] = userModifyBeforeAdd;
                     Session["sActionModify"] = sActionModify;
                     Session["bUpdateXmlFile_to_RestartProc"] = bUpdateXmlFile_to_RestartProc;
-                    Session["bUpdateScrMain"] = bUpdateScrMain;
-                    Session["bUpdateScrAdd"] = bUpdateScrAdd;
+                    Session["bUpdateScr"] = bUpdateScr;
                     Session["message"] = message;
                 }
 
                 // восстанавливаем из сессии глобальные переменные
                 permSetOriginal = (TPermissionsSettings)Session["permSetOriginal"];
                 permSetModify = (TPermissionsSettings)Session["permSetModify"];
+                userCurrent = (TUser)Session["userCurrent"];
                 userModify = (TUser)Session["userModify"];
+                userCurrentBeforeAdd = (TUser)Session["userCurrentBeforeAdd"];
                 userModifyBeforeAdd = (TUser)Session["userModifyBeforeAdd"];
                 sActionModify = (string)Session["sActionModify"];
                 bUpdateXmlFile_to_RestartProc = (bool)Session["bUpdateXmlFile_to_RestartProc"];
-                bUpdateScrMain = (bool)Session["bUpdateScrMain"];
-                bUpdateScrAdd = (bool)Session["bUpdateScrAdd"];
+                bUpdateScr = (bool)Session["bUpdateScr"];
                 message = (string)Session["message"];
                 // !!! ViewState - требует сериализации объектов (доделать типы!)
                 //appSet = (TAppSettings)ViewState["appSet"]; 
                 //permSetModify = (TPermissionsSettings)ViewState["permSetModify"];
+                //userCurrent = (TUser)ViewState["userCurrent"];
                 //userModify = (TUser)ViewState["userModify"];
                 //sActionModify = (string)ViewState["sActionModify"];
                 //bUpdateXmlFile_to_RestartProc = (bool)ViewState["bUpdateXmlFile_to_RestartProc"];
-                //bUpdateScrMain = (bool)ViewState["bUpdateScrMain"];
+                //bUpdateScr = (bool)ViewState["bUpdateScr"];
                 //message = (string)ViewState["message"];
 
                 // восстанавливаем состояние кнопок (после восстановлеиня из формы!)
-                SetUpdateScrMain(bUpdateScrMain);
-                SetUpdateScrAdd(bUpdateScrAdd);
+                SetUpdateScr(bUpdateScr);
 
             }  // первая загрузка . нет 
 
@@ -310,21 +299,23 @@ namespace BotUAC
                 Session["appSet"] = appSet;
                 Session["permSetOriginal"] = permSetOriginal;
                 Session["permSetModify"] = permSetModify;
+                Session["userCurrent"] = userCurrent;
                 Session["userModify"] = userModify;
+                Session["userCurrentBeforeAdd"] = userCurrentBeforeAdd;
                 Session["userModifyBeforeAdd"] = userModifyBeforeAdd;
                 Session["sActionModify"] = sActionModify;
                 Session["bUpdateXmlFile_to_RestartProc"] = bUpdateXmlFile_to_RestartProc;
-                Session["bUpdateScrMain"] = bUpdateScrMain;
-                Session["bUpdateScrAdd"] = bUpdateScrAdd;
+                Session["bUpdateScr"] = bUpdateScr;
                 Session["message"] = message;
 
                 // !!! ViewState - требует сериализации объектов (доделать типы!)
                 //ViewState["appSet"] = appSet;
                 //ViewState["permSetModify"] = permSetModify;
+                //ViewState["userCurrent"] = userCurrent;
                 //ViewState["userModify"] = userModify;
                 //ViewState["sActionModify"] = sActionModify;
                 //ViewState["bUpdateXmlFile_to_RestartProc"] = bUpdateXmlFile_to_RestartProc;
-                //ViewState["bUpdateScrMain"] = bUpdateScrMain;
+                //ViewState["bUpdateScr"] = bUpdateScr;
                 //ViewState["message"] = message;
             }
         }
@@ -359,16 +350,14 @@ namespace BotUAC
             btnSave.Visible = true;
 
             // восстанавливаем пользователя, бывшего перед добавлением
-            userModify = userModifyBeforeAdd.Clone();
-            userModifyBeforeAdd = null;     // уничтожаем
+            userCurrent = userCurrentBeforeAdd;
+            userModify = userModifyBeforeAdd;
+            userCurrentBeforeAdd = null;    // \ уничтожаем
+            userModifyBeforeAdd = null;     // /
             // выводим на экран все данные МОДИФИЦИРУЕМОГО пользователя
             RefreshScreenForUser();
             // активируем список имени
-            cbxUserName.Focus();
-
-            // восстанвливаем доступность кнопок в основном режимке
-            SetUpdateScrMain(bUpdateScrMain);
-
+            //cbxUserName.Focus();
         }
 
 
@@ -376,10 +365,20 @@ namespace BotUAC
         {
 
             // переносим текущее состояние пользователя c экрана в объект-модификации (если не сменили на экране пользователя !)
-            UserApply();  // берем Роль и Разрешения сетки с экрана в модифицируемого 
+            ApplyUser();  // берем Роль и Разрешения сетки с экрана в модифицируемого 
 
-            // сохраняем нового тек.пользователя на момент добавления нового - для Cancel !
-            userModifyBeforeAdd = userModify.Clone();
+            // перед добавлением нового пользователя проверяем измененность атрибутов старого пользователя 
+            if (bUpdateScr)
+            {
+                //if (MessageBox.Show("Data changed. Save User " + userCurrent.UserName + " ?", "Save User", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
+                {
+                    UserSave(false);   // не удаление пользователя
+                }
+            }
+
+            // сохраняем тек.пользователя на момент добавления нового - для Cancel !
+            userCurrentBeforeAdd = userCurrent;
+            userModifyBeforeAdd = userModify;
 
             // прячем список и кнопки
             cbxUserName.Visible = false;
@@ -395,29 +394,28 @@ namespace BotUAC
             lblUserName_Error.Visible = true;
 
             //---------------
-            // при добавлении создаем нового пользователя для коррекции
+            // создаем нового пользователя для коррекции
+            userCurrent = null;   // новый - еще нет в списке !
+            // userModify = new TUser();   - может из-за пустого слетало в ApplyUser() на имени пользоватлея !?
             userModify = new TUser("", "", new TPermissions());  
             //---------------
 
             // очищаем поля формы - разрешения
-            txtUserName.Text = "";      // иначе останется от прошлого ввода, но потом выведем для изменяемого - можно не делать
+            txtUserName.Text = "";      // иначе останется от прошлого ввода !
             lblUserName_Error.Text = "";
             // выводим на экран все данные МОДИФИЦИРУЕМОГО пользователя
             RefreshScreenForUser();
             // доступность кнопок нового пользователя  - от заполненности имени 
             btnSaveNew.Enabled = (txtUserName.Text.Trim().Length > 0);
-            // активируем ввод имени !!!
-            txtUserName.Focus();
-
-            // снимаеи признак измененности нового
-            SetUpdateScrAdd(false);
+            // активируем ввод имени
+            //txtUserName.Focus();
 
         }
 
         //----------------------------------------------------------
-        // сохраняем состояние СТАРОГО пользователя на экрана в объекте-модификации 
+        // сохраняем состояние пользователя на экрана в объекте-модификации 
         //  !!! берем Роль и Разрешения сетки с экрана в модифицируемого 
-        private void UserApply()
+        private void ApplyUser()
         {
             // назначаем Имя
             if (txtUserName.Visible)  // только в режиме Добавления пользователя !
@@ -454,12 +452,12 @@ namespace BotUAC
             }
             userModify.Permissions.Set(permAllow);  // заменыем/добавляем к старым
             userModify.Permissions.Set(permDeny);   // заменыем/добавляем к старым
-        }  // UserApply()
+        }  // ApplyUser()
 
 
         //---------------------------------------------------
-        // занесение нового (модифицируемого) пользователя с экрана в коллекцию
-        public bool UserAddToCollection()
+        // сохранение в файле ТЕКУЩЕГО USER
+        public bool UserSave(bool bRemoveUser)
         {
             bool bRet = false;
             string sErr = "";
@@ -476,47 +474,95 @@ namespace BotUAC
                     //return bRet; //=================>
                 }
 
-                // переносим текущее состояние пользователя c экрана в объект-модификации (если не сменили на экране пользователя !)
-                UserApply();  // берем Роль и Разрешения сетки с экрана в модифицируемого 
-
-                // доопределяем нового (модифицированного)
-                userModify.UserName = txtUserName.Text;
-
-                // добавляем нового (модифицированного) в коллекцию
-                permSetModify.Users.Add(userModify.Clone());
-
-                // прячем поле ввода имени
-                txtUserName.Visible = false;
-                // прячем кнопки Нового пользователя
-                btnCancelNew.Visible = false;
-                btnSaveNew.Visible = false;
-                // показываем список
-                cbxUserName.Visible = true;
-                btnAddUser.Visible = true;
-                btnDelUser.Visible = true;
-                btnCancel.Visible = true;
-                btnSave.Visible = true;
-
-                // добавляем новое имя в список имен пользователей 
-                cbxUserName.Items.Add(userModify.UserName);
-                // сортируем элементы списка Имен
-                SortCbxItems(cbxUserName);
-                // qqq позиционируем в списке имен пользователей на добавленного
-                int index = cbxUserName.Items.IndexOf(cbxUserName.Items.FindByText(userModify.UserName));
-                if (index >= 0)  // должно быть!
+                // !!! сохраняем МОДИФИРОВАННОГО пользователя (могди уже в форме перейти на другого !)
+                string sUserName = userModify.UserName;
+                if (sUserName == "") // не должно быть !!!
                 {
-                    cbxUserName.SelectedIndex = index; // c 0 !?
-                }
-                else
-                {
-                    cbxUserName.SelectedIndex = 0; // c 0 !?
+                    //MessageBox.Show("Modify User Name is Empty!", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    //return bRet; //=================>
                 }
 
-                // выводим на экран все данные МОДИФИЦИРУЕМОГО пользователя
-                RefreshScreenForUser();
+                //======================
+                // вычитываем документ из файла - откорректируем его по введенному и сохраним
+                XDocument docNew = XDocument.Load(permSetModify.FileNameFull);
+                //======================
 
-                // восстанвливаем доступность кнопок в основном режимке - true (добавили нового в коллекцию) !!!
-                SetUpdateScrMain(true);
+                //--------------------
+                //  ищем модифицированного пользователы в Документе перебором
+                XElement xeUsers = docNew.Root.Element("users");
+                //XElement xeUser = xeUsers.Element("userName"); - == null !
+                IEnumerable<XElement> childUsers = from el in xeUsers.Elements() select el;
+                XElement xeUser = null;
+                foreach (XElement xe in childUsers)
+                {
+                    if (xe.Element("userName") != null)
+                    {
+                        if (xe.Element("userName").Value == sUserName)
+                        {
+                            xeUser = xe; break; //----------->
+                        }
+                    }
+                }
+
+                //--------------------
+                // удаляем модифицированного текущего Пользователя  в Докуенте
+                if (xeUser != null)   // может не быть пользователя (новый) !!!
+                {
+                    // удаляем пользователя из Докуента (сохраним документ)
+                    xeUser.Remove();
+                }
+
+                //--------------------
+                // добавляем модифицированного текущего Пользователя в документ
+                if (!bRemoveUser)  // НЕ УДАЛЕНИЕ пользователя
+                {
+                    XElement xeUserModify = userModify.ToXElement();
+                    xeUsers.Add(xeUserModify);
+                }
+
+                //--------------------
+                // удаляем модифицированного текущего Пользователя в Объекте - после формирования для Докуента !
+                if (bRemoveUser)    // УДАЛЕНИЕ пользователя
+                {
+                    // снимаем признак измененности данных
+                    SetUpdateScr(false);
+                    // удаляем пользователя из объекта
+                    permSetModify.Users.Drop(sUserName);
+                    // удаляем пользователя из списка
+                    cbxUserName.Items.Remove(sUserName);
+                    cbxUserName.SelectedIndex = 0; // c 0 !
+                    //Application.DoEvents();
+                    // назначаем нового тек. пользователя
+                    sUserName = cbxUserName.Text;
+                    UserSet(sUserName);
+                    //throw new Exception("XElement 'user' not found !");  //====>
+                }
+                else // не удаление пользователя (корреуция существубщего)
+                {
+                    // сохраняем в Объекте (добавляем/заменыем)
+                    permSetModify.Users.Set(userModify);
+
+                    // выводим на экран все данные МОДИФИЦИРУЕМОГО пользователя
+                    RefreshScreenForUser();
+                }
+
+                //======================
+                // сохраняем откоректирванный документ в файле
+                try
+                {
+                    docNew.Save(permSetModify.FileNameFull);
+                    bUpdateXmlFile_to_RestartProc = true;    // для перезапуска заданного процесса при завершении работы с формой
+                    //MessageBox.Show("File saved." + Environment.NewLine +
+                    //     Environment.NewLine + permSetModify.FileNameFull + "_new", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    sErr = sErr + (sErr == "" ? "" : " // ") + ex.Message;
+                    //MessageBox.Show("File not saved." + Environment.NewLine +
+                    //     Environment.NewLine + permSetModify.FileNameFull + "_new" + Environment.NewLine +
+                    //     Environment.NewLine + "Error: " + ex.Message, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                //======================
 
             }
             catch (Exception e)
@@ -535,108 +581,24 @@ namespace BotUAC
             }
             return bRet; //=======================>
 
-        } // UserAddToCollection()
-
-
-        //---------------------------------------------------
-        // удалене модифицируемого пользователя из коллекцию
-        public bool UserDel()
-        {
-            bool bRet = false;
-            string sErr = "";
-            try
-            {
-                if (permSetModify == null)  // не должно быть !!!
-                {
-                    //MessageBox.Show("PermissionSettingtngs not defined!", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    //return bRet; //=================>
-                }
-                if (userModify == null)  // не должно быть !!!
-                {
-                    //MessageBox.Show("Modify User not defined!", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    //return bRet; //=================>
-                }
-
-                // !!! имя пользователя для УДАЛЕНИЯ (могди уже в форме перейти на другого !)
-                string sUserName = userModify.UserName;
-                if (sUserName == "") // не должно быть !!!
-                {
-                    //MessageBox.Show("Modify User Name is Empty!", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    //return bRet; //=================>
-                }
-
-                // удаляем пользователя из объекта
-                permSetModify.Users.Drop(sUserName);
-                // удаляем пользователя из списка
-                if (cbxUserName.Items.Count > 1)
-                {
-                    cbxUserName.Items.Remove(sUserName);
-                }
-                else  // последний элемент не удаляется обычным образом - просто чистим список !
-                {
-                    cbxUserName.Items.Clear();
-                }
-                // назначаем текущий в списке
-                if (cbxUserName.Items.Count > 0)
-                {
-                    cbxUserName.SelectedIndex = 0; // c 0 !
-                }
-                //Application.DoEvents();
-                // назначаем нового тек. пользователя
-                sUserName = cbxUserName.Text;
-                UserModifySet(sUserName, true);  // true - полсе удаления !!!
-                // выводим на экран все данные МОДИФИЦИРУЕМОГО пользователя
-                RefreshScreenForUser();
-
-                // восстанвливаем доступность кнопок в основном режимке - true (удалили из коллекцию) !!!
-                SetUpdateScrMain(true);
-
-            }
-            catch (Exception e)
-            {
-                sErr = sErr + (sErr == "" ? "" : " // ") + e.Message;
-                //MessageBox.Show("Error save User:" + Environment.NewLine +
-                //    Environment.NewLine + sErr, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            if (bRet)
-            {
-                message = "";
-            }
-            else
-            {
-                message = sErr;
-            }
-            return bRet; //=======================>
-
-        } // UserDel()
+        } // UserSave()
 
 
         //-----------------------------------------
         // назначает МОДИФИЦИРУЕМОГО пользователя
-        private void UserModifySet(string UserName, bool AfterDelete)
+        private void UserSet(string UserName)
         {
-            // сохраняем модифицируемого пользователя в модифичируемую коллекцию
-            if (!AfterDelete) // удаленныей не сохраняем !!!
+            userCurrent = permSetModify.Users.FindUser(UserName);  // должен быть !!!
+            // если не нашли текущего пользователя - считаем, что это добавленный, создаем 
+            if (userCurrent == null)  //  (для отката значений !)
             {
-                if (userModify != null)  // не начальный
-                {
-                    permSetModify.Users.Set(userModify.Clone());
-                }
+                userCurrent = new TUser(cbxUserName.Text, cbxUserName.Text, new TPermissions());
             }
-
-            // назначаем нового модифицируемого пользователя
-            if (UserName.Trim().Length > 0)
-            {
-                userModify = permSetModify.Users.FindUser(UserName).Clone();  // должен быть !!!
-            }
-            else
-            {
-                userModify = new TUser("", "", new TPermissions());
-            }
-
+            // пользователь для модификации
+            userModify = userCurrent.Clone();
             // выводим на экран все данные МОДИФИЦИРУЕМОГО пользователя
             RefreshScreenForUser();
-        }  // UserModifySet()
+        }  // UserSet()
 
         //-----------------------------------------
         // выводит на экран все данные МОДИФИЦИРУЕМОГО пользователя
@@ -672,28 +634,8 @@ namespace BotUAC
                 // выводим на экран Разрешения (сетку) МОДИФИЦИРУЕМОГО пользователя
                 RefreshScreenForPermissions();
 
-                // доступность кнопки Удаления пользователя
-                btnDelUser.Enabled = (cbxUserName.Text.Trim() != "");
-
-                //-------------------------------------
-                // рзрешаем / запрещаем дедактирование (нельзя, если нет пользовтелей - пустой выпадающий список!)
-                bool bEnabled = ((cbxUserName.Visible && cbxUserName.Text.Trim() != "") || (txtUserName.Visible));
-                cbxUserName.Enabled = bEnabled;
-                cbxAction.Enabled = bEnabled;
-                btnAllow.Enabled = bEnabled;
-                btnDeny.Enabled = bEnabled;
-                // сетка
-                foreach (GridViewRow row in GridView1.Rows)
-                {
-                    if (row.RowType == DataControlRowType.DataRow)
-                    {
-                        CheckBox ckb;
-                        ckb = (row.Cells[nColUserAllow].FindControl("ckbAllow") as CheckBox);
-                        ckb.Enabled = bEnabled;
-                        ckb = (row.Cells[nColUserAllow].FindControl("ckbDeny") as CheckBox);
-                        ckb.Enabled = bEnabled;
-                    }
-                } // по строкам сетки
+                // снимаем признак измененности данных на форме
+                SetUpdateScr(false);
             }
         }  // RefreshScreenForUser()
 
@@ -740,7 +682,7 @@ namespace BotUAC
                                     if (row.RowType == DataControlRowType.DataRow)
                                     {
                                         string extensName = row.Cells[1].Text;
-                                        //string extensId = row.Cells[0].Text; - всегда пустой в скрытой колонке !!!
+                                        //string extensId = row.Cells[0].Text; qqq - всегда пустой в скрытой колонке !!!
                                         string extensId = null;
                                         TExtension extens = permSetModify.Extensions.FindExtensionName(extensName);
                                         if (extens != null)
@@ -840,12 +782,11 @@ namespace BotUAC
 
         } //  ClearPermissionsUser()
 
-        //------------------
-        // установка признака измененности данных КОЛЛЕКЦИИ(с вкл/выкл кнопок)
-        private void SetUpdateScrMain(bool upd)
+
+        private void SetUpdateScr(bool upd)
         {
-            bUpdateScrMain = upd;
-            if (bUpdateScrMain)
+            bUpdateScr = upd;
+            if (bUpdateScr)
             {
                 btnCancel.Enabled = true;
                 btnSave.Enabled = true;
@@ -857,38 +798,25 @@ namespace BotUAC
                 btnSave.Enabled = false;
                 //btnClose.Enabled = true;
             }
-        }  // SetUpdateScrMain()
-
-        //------------------
-        // установка признака измененности данных НОВОГО ПОЛЬЗОВАТЕЛЯ (с вкл/выкл кнопок)
-        private void SetUpdateScrAdd(bool upd)
-        {
-            bUpdateScrAdd = upd;
-            btnCancelNew.Enabled = true;  // всегда !
-            if (bUpdateScrAdd)
-            {
-                btnSaveNew.Enabled = true;
-            }
-            else
-            {
-                btnSaveNew.Enabled = false;
-            }
-        }  // SetUpdateScrAdd()
-
+        }  // SetUpdateScr()
 
         protected void cbxUserName_SelectedIndexChanged(object sender, EventArgs e)
         {
 
             // переносим текущее состояние пользователя c экрана в объект-модификации (если не сменили на экране пользователя !)
             // !!! делаем здесь, т.к. нет события cbxUserName_DropDown(object sender, EventArgs e) !!!
-            UserApply();  // берем Роль и Разрешения сетки с экрана в модифицируемого 
+            ApplyUser();  // берем Роль и Разрешения сетки с экрана в модифицируемого 
 
+            // перед назначением нового пользователя проверяем измененность атрибутов старого пользователя 
+            if (bUpdateScr)
+            {
+                //if (MessageBox.Show("Data changed. Save User " + userCurrent.UserName + " ?", "Save User", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
+                {
+                    UserSave(false);   // не удаление пользователя
+                }
+            }
             // назначаем нового текущего пользователя
-            UserModifySet(cbxUserName.Text, false);  // false - НЕ полсе удаления !!!
-
-            // доступность кнопки Удаления рользователя
-            btnDelUser.Enabled = (cbxUserName.Text.Trim() != "");
-
+            UserSet(cbxUserName.Text);
         }
 
         protected void btnAllow_Click(object sender, EventArgs e)
@@ -922,15 +850,7 @@ namespace BotUAC
             } // по строкам сетки
             if (bUpd)
             {
-                if (txtUserName.Visible)
-                {
-                    SetUpdateScrAdd(true);
-                }
-                else
-                {
-                    SetUpdateScrMain(true);
-                }
-
+                SetUpdateScr(true);
             }
         }
 
@@ -965,14 +885,7 @@ namespace BotUAC
             } // по строкам сетки
             if (bUpd)
             {
-                if (txtUserName.Visible)
-                {
-                    SetUpdateScrAdd(true);
-                }
-                else 
-                {
-                    SetUpdateScrMain(true);
-                }
+                SetUpdateScr(true);
             }
 
         }
@@ -982,7 +895,7 @@ namespace BotUAC
             // переносим текущее состояние пользователя c экрана в объект-модификации (если не сменили на экране пользователя !)
             // !!! делаем здесь, т.к. нет события cbxAction_DropDown(object sender, EventArgs e) !!!
             // ! до назначения новой на место текущей !!!
-            UserApply();  // берем Роль и Разрешения сетки с экрана в модифицируемого 
+            ApplyUser();  // берем Роль и Разрешения сетки с экрана в модифицируемого 
 
             // назначаем новую акцию текущей
             sActionModify = cbxAction.Text;
@@ -993,15 +906,7 @@ namespace BotUAC
 
         protected void CheckBox1_CheckedChanged(object sender, EventArgs e)
         {
-            // обработка события для чекбокса в колонке сетки (ckbAllow и ckbDeny) 
-            if (txtUserName.Visible)
-            {
-                SetUpdateScrAdd(true);
-            }
-            else
-            {
-                SetUpdateScrMain(true);
-            }
+            SetUpdateScr(true);
         }
 
         protected void txtUserName_TextChanged(object sender, EventArgs e)
@@ -1014,6 +919,111 @@ namespace BotUAC
             btnSaveNew.Enabled = isValid;
         }
 
+        protected void btnSaveNew_Click(object sender, EventArgs e)
+        {
+            // переносим текущее состояние пользователя c экрана в объект-модификации (если не сменили на экране пользователя !)
+            ApplyUser();  // берем Роль и Разрешения сетки с экрана в модифицируемого 
+
+            // само сохранение
+            UserSaveNew(); 
+        }
+
+
+        //---------------------------------------------------
+        // сохранение в файле НОВОГО USER
+        public bool UserSaveNew()
+        {
+            bool bRet = false;
+            string sErr = "";
+            try
+            {
+                if (permSetModify == null)  // не должно быть !!!
+                {
+                    //MessageBox.Show("PermissionSettingtngs not defined!", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    //return bRet; //=================>
+                }
+                if (userModify == null)  // не должно быть !!!
+                {
+                    //MessageBox.Show("Modify User not defined!", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    //return bRet; //=================>
+                }
+
+                //------------------------------
+                // проверяем значение поля Имени пользователя
+                if (!ValidateUserName())
+                {
+                    return bRet; //=================>
+                }
+
+                //--------------------------------
+                // берем имя нового пользователя в модифицируемого (ghb lj,fdltybb ,skj gecnjt!)
+                userModify.UserName = txtUserName.Text;
+                // добавляем в объект
+                TUser user = new TUser(txtUserName.Text, null, new TPermissions());
+                permSetModify.Users.Add(user);
+                userCurrent = user;
+                //--------------------------------
+
+                // прячем поле ввода имени
+                txtUserName.Visible = false;
+                // прячем кнопки Нового пользователя
+                btnCancelNew.Visible = false;
+                btnSaveNew.Visible = false;
+                // показываем список
+                cbxUserName.Visible = true;
+                btnAddUser.Visible = true;
+                btnDelUser.Visible = true;
+                btnCancel.Visible = true;
+                btnSave.Visible = true;
+                // активируем список имени
+                //cbxUserName.Focus();
+
+                //=================
+                // само сохранение - нового уже добавили объект потзоватеелй, назначили текушим 
+                UserSave(false);   // не удаление пользователя
+                //=================
+
+                // добавляем в список, позиционируем на него в списке - !!! после сохранения!!!
+                cbxUserName.Items.Add(txtUserName.Text);
+                // позиционируем - !!! список с авт.сотировкой, надо искать занчение !!!
+                //int index = cbxUserName.FindStringExact(txtUserName.Text); -- нет метода в WEB !!!
+                //int index = cbxUserName.Items.FindByText(txtUserName.Text);  -- возвращает объект
+                int index = cbxUserName.Items.IndexOf(cbxUserName.Items.FindByText(txtUserName.Text));
+                if (index >= 0)  // должно быть!
+                {
+                    cbxUserName.SelectedIndex = index; // c 0 !?
+                }
+                else
+                {
+                    cbxUserName.SelectedIndex = 0; // c 0 !?
+                }
+                // сортируем элементы списка Имен
+                SortCbxItems(cbxUserName);
+
+                // выводим на экран все данные МОДИФИЦИРУЕМОГО пользователя
+                RefreshScreenForUser();
+                // снимаем признак измененности данных на экране
+                SetUpdateScr(false);
+
+            }
+            catch (Exception e)
+            {
+                sErr = sErr + (sErr == ""? "" : " // ") + e.Message;
+                //MessageBox.Show("Error save User:" + Environment.NewLine +
+                //    Environment.NewLine + sErr, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            if (bRet)
+            {
+                message = "";
+            }
+            else
+            {
+                message = sErr;
+            }
+            return bRet; //=======================>
+
+        } // UserSaveNew()
+
 
         protected void btnDelUser_Click(object sender, ImageClickEventArgs e)
         {
@@ -1024,11 +1034,17 @@ namespace BotUAC
         // удаление пользователя (из списка и из файла)
         private void UserRemove()
         {
-            // проверки
-            // ...
+            if (cbxUserName.Items.Count < 2)
+            {
+                //MessageBox.Show(cbxUserName + "  is the last user in the list !", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return; //===========>
+            }
+            //if (MessageBox.Show("Remove user " + cbxUserName.Text + " ?" + Environment.NewLine +
+            //    Environment.NewLine + "Recovery will be impossible !", this.Text, MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) != DialogResult.Yes)
+            //    return; //===========>
 
-            // само удаление старого пользователя
-            UserDel();   
+            // само удаление
+            UserSave(true);   // true - удаление пользователя
         }
 
 
@@ -1238,7 +1254,6 @@ namespace BotUAC
         {
             bool bRet = false;
             string sErr = "";
-
             try
             {
                 if (permSetModify == null)  // не должно быть !!!
@@ -1254,20 +1269,21 @@ namespace BotUAC
 
                 //-------------------------
                 // переносим текущее состояние пользователя c экрана в объект-модификации (если не сменили на экране пользователя !)
-                UserApply();  // берем Роль и Разрешения сетки с экрана в модифицируемого 
-                // сохраняем в Объекте модифицированного пользователя (заменяем - уже должен быть в коллекции, и для нового!)
-                if (userModify.UserName.Trim() != "")  // !!! с пустым именем будет после удаления последнего в списке !!!
-                {
-                    permSetModify.Users.Set(userModify.Clone());
-                }
+                ApplyUser();  // берем Роль и Разрешения сетки с экрана в модифицируемого 
+                // сохраняем в Объекте (заменыем - уже должен быть в коллекции, и для нового!)
+                permSetModify.Users.Set(userModify.Clone());
                 // берем список пользователей из Коллекции (объекта)
                 TUsers newUsers = permSetModify.Users;
+                // выводим на экран все данные ТЕКУЩЕГО пользователя
+                //RefreshScreenForUser();
+
 
                 //======================
                 // вычитываем документ из файла - откорректируем его по введенному и сохраним
                 XDocument docNew = XDocument.Load(permSetModify.FileNameFull);
                 //======================
 
+                //--------------------
                 //  ищем Список пользователей в Документе перебором
                 XElement xeUsers = docNew.Root.Element("users");
                 // удаляем Список пользователей  в Докуенте
@@ -1280,23 +1296,23 @@ namespace BotUAC
                 docNew.Root.Add(newUsers.ToXElement());
 
                 //======================
-                // сохраняем откоректирванный документ в файле (с перезапуском процесса)
-                string Message = null;
-                if (WriteChangesToXMLFileAndRestart(docNew, permSetModify.FileNameFull, out Message))
+                // сохраняем откоректирванный документ в файле
+                try
                 {
-                    // назначаем текущую коллекцию оригинальной (откат будет уже к ней)
-                    permSetOriginal = permSetModify.Clone();
-                    // снимаем признак измененности коллекции 
-                    SetUpdateScrMain(false);
+                    docNew.Save(permSetModify.FileNameFull);
+                    bUpdateXmlFile_to_RestartProc = true;    // для перезапуска заданного процесса при завершении работы с формой
+                    //MessageBox.Show("File saved." + Environment.NewLine +
+                    //     Environment.NewLine + permSetModify.FileNameFull + "_new", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
-                else
+                catch (Exception ex)
                 {
-                    if (Message != "")
-                    {
-                        sErr = sErr + (sErr == "" ? "" : " // ") + Message;
-                    }
+                    sErr = sErr + (sErr == "" ? "" : " // ") + ex.Message;
+                    //MessageBox.Show("File not saved." + Environment.NewLine +
+                    //     Environment.NewLine + permSetModify.FileNameFull + "_new" + Environment.NewLine +
+                    //     Environment.NewLine + "Error: " + ex.Message, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 //======================
+
             }
             catch (Exception e)
             {
@@ -1312,196 +1328,40 @@ namespace BotUAC
             {
                 message = sErr;
             }
-
             return bRet; //=======================>
 
         } // UsersSave()
 
 
-        //----------------------------------------
         // восстанавливаем первоначальные данные СПИСКА пользователей (были до начала коррекции)
         private void UsersCancel(string UserName)
         {
-            if (txtUserName.Visible)   // !!! только для старого !
-            {
-                return; //=============>
-            }
 
-            // запоминаем имя текущего редуктируемого старого пользователя
-            string sUserName = cbxUserName.Text;
-            string sActionName = cbxAction.Text;
+            //// копируем исходный список в рабочий список
+            //userModify = user.Clone();
 
-            // восстанвливаем модифицируемую коллекцию из сохраненной первоначальной
-            permSetModify = permSetOriginal.Clone();
+            //// выводим на экран все данные МОДИФИЦИРУЕМОГО пользователя
+            //RefreshScreenForUser();
 
-            // установка пользователя после отмены коррекции коллекции
-            UserSetBegin(sUserName, sActionName);  //  имя пользователя для позиционирования (при пустом - первый по алфавитному списку)
 
-            // снимаем признак измененности коллекции 
-            SetUpdateScrMain(false);
-
+            //// ищем тек.пользователя в общем списке Объекта
+            //TUser user = permSetModify.Users.FindUser(UserName);
+            //if (user != null)  // нашли пользователя 
+            //{
+            //    // копируем исходного пользователя в модифицируемого
+            //    userModify = user.Clone();
+            //    // выводим на экран все данные МОДИФИЦИРУЕМОГО пользователя
+            //    RefreshScreenForUser();
+            //}
+            //else
+            //{
+            //    //Response.Write("Restore Error - user not found:" + " \"" + UserName + "\" !");
+            //    Response.Write(TMess.Mess0013 + " \"" + UserName + "\" !");
+            //}
         } // UsersCancel()
 
-        //--------------------------------------------
-        // начальная установка пользователя для его коррекции
-        //    Параметр - имя пользователя для позиционирования (при пустом - первый по алфавитному списку)
-        public void UserSetBegin(string UserName, string ActionName)
-        {
-            int nSetIndex;
 
-            // свойства контролов по умолчанию
-            txtUserName.Visible = false;
-            lblUserName_Error.Visible = false;
-
-            btnCancelNew.Visible = false;
-            btnSaveNew.Visible = false;
-
-            btnCancel.Text = "Undo";
-            btnSave.Text = "Save";
-
-            btnCancelNew.Text = "Cancel";
-            btnSaveNew.Text = "Add";
-
-            // UserName - выпадаюший список
-            cbxUserName.Items.Clear();
-            foreach (TUser user in permSetModify.Users)
-            {
-                cbxUserName.Items.Add(user.UserName);
-            }
-            // сортируем элементы списка Имен
-            SortCbxItems(cbxUserName);
-            // позиционируем выпадающий список 
-            if (cbxUserName.Items.Count > 0)  // на первый элемент списка
-            {
-                nSetIndex = 0;
-                if (UserName != "")
-                {
-                    int index = cbxUserName.Items.IndexOf(cbxUserName.Items.FindByText(UserName));
-                    if (index >= 0)  // может не быть быть!
-                    {
-                        nSetIndex = index; 
-                    }
-                }
-                cbxUserName.SelectedIndex = nSetIndex; // c 0 !?
-            }
-            //if (cbxUserName.Items.Count == 0) - считается допустимым !
-            //{
-            //    //Response.Write("Error permissions config-file - empty Users list: " + permSetModify.FileNameFull); // "<br>" + 
-            //    Response.Write(TMess.Mess0009 + " " + permSetModify.FileNameFull); // "<br>" + 
-            //    return; //======================>
-            //}
-
-            // Операции - заполняем выпадаюший список
-            cbxAction.Items.Clear();
-            foreach (TAction act in permSetModify.Actions)
-            {
-                cbxAction.Items.Add(act.ActionName);
-            }
-            if (cbxAction.Items.Count > 0)  
-            {
-                nSetIndex = 0;
-                if (UserName != "")
-                {
-                    int index = cbxAction.Items.IndexOf(cbxAction.Items.FindByText(ActionName));
-                    if (index >= 0)  // может не быть быть!
-                    {
-                        nSetIndex = index;
-                    }
-                }
-                cbxAction.SelectedIndex = nSetIndex;
-                sActionModify = cbxAction.Text;   // !!! надо здесь - не срабатывает событие смены индекса !!!
-            }
-            if (cbxAction.Items.Count == 0)  // не должно быть
-            {
-                //SayError(("Error permissions config-file - empty Actionы list: " + permSetModify.FileNameFull); 
-                SayError(TMess.Mess0010 + " " + permSetModify.FileNameFull);
-                return; //======================>
-            }
-
-
-
-            // Разрешения - строки сетки
-            PermRow permRow;
-            foreach (TExtension ext in permSetModify.Extensions) // добавляем строки в сетку
-            {
-                permRow = new PermRow(ext.ExtensionId, ext.ExtensionName, false, false);
-                this.GridData.Add(permRow);
-            }
-            GridView1.DataSource = this.GridData;
-            GridView1.DataBind();
-
-            // изменяем высоту зоны просмотра сетки по числу строк в сетке (resize)
-            panGrid.Height = 40 + 30 * GridView1.Rows.Count;
-
-
-            // обновляем данные на экране для нового тек. пользователя, назначаем modify !
-            UserModifySet(cbxUserName.Text, false);  // false - НЕ полсе удаления !!!
-
-        } // UserSetBegin()
-
-        protected void btnSaveNew_Click(object sender, EventArgs e)
-        {
-            // переносим текущее состояние пользователя c экрана в объект-модификации (если не сменили на экране пользователя !)
-            UserApply();  // берем Роль и Разрешения сетки с экрана в модифицируемого 
-
-            // занесение нового (модифицируемого) пользователя с экрана в коллекцию
-            UserAddToCollection();
-        }
-
-
-        //------------------------------------------------------------------
-        // сохранение документа в файле, перезапуск процесса через событие
-        //   BotUAC  - клиент (испльзуем существующее событие, если оно есть)
-        //   Process - сервер (создает событие)
-        // 
-        public bool WriteChangesToXMLFileAndRestart(XDocument docNew, string FileNameFull, out string Message)
-        {
-            bool bFileSaved = false;
-            bool bEventExist = false;
-            Message = "";
-            try
-            {
-                // готовим событие
-                string sEventName = appSet.EventName;
-                string sMutexName = appSet.MutexName;
-                EventWaitHandle eventUpdFile;
-                Mutex mutexUpdFile;
-                // открываем именованое событие (поцесс его должен был создать!)
-                eventUpdFile = EventWaitHandle.OpenExisting(sEventName);
-                bEventExist = true;
-                // ждем Mutex
-                mutexUpdFile = Mutex.OpenExisting(sMutexName);
-                mutexUpdFile.WaitOne();
-                {
-                    //------------------------------------
-                    // сохраняем документ в файле с генерацией события
-                    docNew.Save(permSetModify.FileNameFull);
-                    bFileSaved = true;
-                    //------------------------------------
-                }
-                mutexUpdFile.ReleaseMutex();
-                // дергаем событие
-                eventUpdFile.Set();
-            }
-            catch (Exception ex)
-            {
-                Message = ex.Message;
-            }
-            // процесса (события) может  не быть - тогда просто сохраняем в файле
-            if (!bEventExist)  
-            {
-                //------------------------------------
-                // сохраняем документ в файле с генерацией события
-                docNew.Save(permSetModify.FileNameFull);
-                bFileSaved = true;
-                //------------------------------------
-            }
-            // результат
-            return bFileSaved; //===============>
-        }
-
-
-        //#######################################################################
+        //---------------------------------------------------
         // !!! ПОСЛЕДНЯЯ - НЕ УДАЛЯТЬ, чтобы не стирался комментарий к закрывабщей процедуру скобке !!!
         public void Empty()
         {

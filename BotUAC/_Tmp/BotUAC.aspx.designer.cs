@@ -167,15 +167,6 @@ namespace BotUAC {
         protected global::System.Web.UI.WebControls.Button btnDeny;
         
         /// <summary>
-        /// panGridRows элемент управления.
-        /// </summary>
-        /// <remarks>
-        /// Автоматически создаваемое поле.
-        /// Для изменения переместите объявление поля из файла конструктора в файл кода программной части.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel panGridRows;
-        
-        /// <summary>
         /// GridView1 элемент управления.
         /// </summary>
         /// <remarks>
@@ -192,15 +183,6 @@ namespace BotUAC {
         /// Для изменения переместите объявление поля из файла конструктора в файл кода программной части.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnCancelNew;
-        
-        /// <summary>
-        /// btnSaveNew элемент управления.
-        /// </summary>
-        /// <remarks>
-        /// Автоматически создаваемое поле.
-        /// Для изменения переместите объявление поля из файла конструктора в файл кода программной части.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnSaveNew;
         
         /// <summary>
         /// btnCancel элемент управления.
@@ -228,5 +210,14 @@ namespace BotUAC {
         /// Для изменения переместите объявление поля из файла конструктора в файл кода программной части.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBox ckbUpdated;
+        
+        /// <summary>
+        /// btnSaveNew элемент управления.
+        /// </summary>
+        /// <remarks>
+        /// Автоматически создаваемое поле.
+        /// Для изменения переместите объявление поля из файла конструктора в файл кода программной части.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnSaveNew;
     }
 }
