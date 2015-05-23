@@ -42,5 +42,8 @@ namespace BotUAC
         public const string Mess0018 = "In the web configuration is not specified AppSettings.irbisFileNameAndPath";
         public const string Mess0019 = "In the web configuration is specified empty AppSettings.irbisFileNameAndPath";
 
+        // ошибка сохранения изменений в файле
+        public const string Mess0020 = "Failed to save changes.";
+
     } // class TMessages
 }

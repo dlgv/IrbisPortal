@@ -87,7 +87,7 @@
     <Compile Include="TPermission.cs" />
     <Compile Include="TPermissions.cs" />
     <Compile Include="TPermissionsSettings.cs" />
-    <Compile Include="TRow_test.cs" />
+    <Compile Include="TPermissionGridRow.cs" />
     <Compile Include="TUser.cs" />
     <Compile Include="TUserRole.cs" />
     <Compile Include="TUserRoles.cs" />

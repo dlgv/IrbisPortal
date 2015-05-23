@@ -184,6 +184,10 @@
                 style="position:absolute; top: 144px; left: 377px; width: 92px; right: 499px;" 
                 onclick="btnSave_Click"  />
 
+            <asp:Label ID="lblSave_Error" runat="server"  
+               style="position: absolute; top: 144px; left: 475px;" ForeColor="Red"
+               ></asp:Label>
+
             <!--
             <asp:CheckBox ID="ckbUpdated"  runat="server" AutoPostBack="true" Checked="false"  visible="true"  /> 
             -->
