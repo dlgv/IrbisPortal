@@ -1355,7 +1355,6 @@ namespace BotUAC
         {
             bool bFileSaved = false;
             bool bEventExist = false;
-            bool bMutexExist = false;
             Message = "";
             try
             {
@@ -1363,26 +1362,12 @@ namespace BotUAC
                 string sEventName = appSet.EventName;
                 string sMutexName = appSet.MutexName;
                 EventWaitHandle eventUpdFile = null;
-                Mutex mutexUpdFile = null;
                 // открываем именованое событие (поцесс его должен был создать!)
                 eventUpdFile = EventWaitHandle.OpenExisting(sEventName);
                 bEventExist = true;
-                // пытаемся открыть Mutex
-                try
-                {
-                    mutexUpdFile = Mutex.OpenExisting(sMutexName);
-                    bMutexExist = true;
-                }
-                catch (Exception exMut1)
-                {
-                    Message = exMut1.Message;
-                }
-                // создаем Mutex (если не смогли лькрыть)
-                if (!bMutexExist)
-                {
-                    mutexUpdFile = new Mutex(false, sMutexName);
-                    bMutexExist = true;
-                }
+                // пытаемся создать Mutex (или открыть существующий)
+                bool createdNew = false;
+                Mutex mutexUpdFile = new Mutex(false, sMutexName, out createdNew);  // -> возвращает false, если mutex уже существует.
                 // ждем Mutex
                 mutexUpdFile.WaitOne();
                 {
@@ -1392,6 +1377,7 @@ namespace BotUAC
                     bFileSaved = true;
                     //------------------------------------
                 }
+                // отпускаем мутекс
                 mutexUpdFile.ReleaseMutex();
                 // дергаем событие
                 eventUpdFile.Set();
