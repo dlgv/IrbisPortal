@@ -1105,7 +1105,7 @@ namespace BotUAC
                 // оформляем текст ошибки
                 string InnerHtml = ErrorMessage;
                 InnerHtml = "<font color=\"red\">" + InnerHtml + "</font>";  // текст красным цветом
-                InnerHtml = "<em>" + InnerHtml + "</em>";           // теги курсива 
+                //InnerHtml = "<em>" + InnerHtml + "</em>";           // теги курсива 
                 InnerHtml = "<strong>" + InnerHtml + "</strong>";   // теги полужирного начертания
                 // показываем ошибку
                 divMain.Visible = false;
@@ -1312,7 +1312,7 @@ namespace BotUAC
             if (cbxAction.Items.Count == 0)  // не должно быть
             {
                 //SayError(("Error permissions config-file - empty Actionы list: " + permSetModify.FileNameFull); 
-                SayError(TMess.Mess0010 + " " + permSetModify.FileNameFull);
+                SayError(TMess.Mess0010 + "<br>File: " + permSetModify.FileNameFull);
                 return; //======================>
             }
 

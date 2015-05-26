@@ -19,9 +19,9 @@ namespace BotUAC
         public const string Mess0008 = "Cancel add new User";
 
         // пустой список пользователей в файле permsiions.xml
-        public const string Mess0009 = "Error permissions config-file - empty Users list:";  // имя файла
-        // пустой список действий в файле permsiions.xml
-        public const string Mess0010 = "Error permissions config-file - empty Actionы list:";  // : имя файла
+        public const string Mess0009 = "Invalid permissions config file: Users list is empty.";  // имя файла
+        // пустой список действий в файле permsions.xml
+        public const string Mess0010 = "Invalid permissions config file: Actions list is empty.";  // : имя файла
 
         // проверка имени нового пользователя
         public const string Mess0011 = "User name is empty!";
@@ -34,16 +34,16 @@ namespace BotUAC
         public const string Mess0014 = "Are you sure you want to delete the user?";
 
         // тултипы кнопок заголовка сетки: Allow, Deny
-        public const string Mess0015 = "Change the values of all cells in the grid column"; // Allow
-        public const string Mess0016 = "Change the values of all cells in the grid column"; // Deny
+        public const string Mess0015 = "Check All"; // Allow
+        public const string Mess0016 = "Check All"; // Deny
 
         // загрузка пераметров приложения из web.config
-        public const string Mess0017 = "In the web configuration is not specified AppSettings parameters";
-        public const string Mess0018 = "In the web configuration is not specified AppSettings.irbisFileNameAndPath";
-        public const string Mess0019 = "In the web configuration is specified empty AppSettings.irbisFileNameAndPath";
+        public const string Mess0017 = "<AppSettings> is not found in the web configuration";
+        public const string Mess0018 = "The key <AppSettings.irbisFileNameAndPath> is not specified in the web configuration";
+        public const string Mess0019 = "The value of the key <AppSettings.irbisFileNameAndPath> is invalid";
 
         // ошибка сохранения изменений в файле
-        public const string Mess0020 = "Failed to save changes.";
+        public const string Mess0020 = "Failed saving changes.";
 
     } // class TMessages
 }
