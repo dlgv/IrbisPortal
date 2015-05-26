@@ -259,8 +259,13 @@
                 if (idName != null)
                 {
                     // изменяем/добавляем атрибуты контролов
-                    bRavno1 = (idElem.substr(idElem.length - 8) == "ckbAllow");
-                    bRavno2 = (idElem.substr(idElem.length - 7) == "ckbDeny");
+                    //   id="GridView1_ctl03_ckbDeny"   - IIS на Windows XP
+                    //   id="GridView1_ckbDeny_1"       - IIS на Windows Server 2012 
+                    //   !!! разные методики формирования ID - искать вхождение подстроки !!!
+                    //bRavno1 = (idElem.substr(idElem.length - 8) == "ckbAllow");
+                    //bRavno2 = (idElem.substr(idElem.length - 7) == "ckbDeny");
+                    bRavno1 = (idElem.indexOf("ckbAllow") + 1);  // indexOf() возвращает если не найдено -1, если найдено - позицию вхождения. В js 0==false, любое др. число даёт true; 
+                    bRavno2 = (idElem.indexOf("ckbDeny") + 1);   // indexOf() возвращает если не найдено -1, если найдено - позицию вхождения. В js 0==false, любое др. число даёт true;
                     if ((idName == "cbxUserName") || (idName == "cbxAction") ||
                        (idName == "btnAllow") || (idName == "btnDeny") ||
                        (idName == "btnAddUser") || (idName == "btnDelUser") ||
