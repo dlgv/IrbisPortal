@@ -9,6 +9,7 @@ using System.Xml.Linq;          // XElement
 
 namespace BotUAC
 {
+    [Serializable]
     public class TParameter
     {
         private string name;

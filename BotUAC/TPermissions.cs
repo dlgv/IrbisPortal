@@ -11,6 +11,7 @@ using System.Collections;  // ArrayList
 
 namespace BotUAC
 {
+    [Serializable]
     public class TPermissions : IEnumerator //, IEnumerable 
     {
         private ArrayList myAL = new ArrayList();       // array of TPermission

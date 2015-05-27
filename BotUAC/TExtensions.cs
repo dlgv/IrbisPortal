@@ -11,24 +11,8 @@ using System.Collections;  // ArrayList
 
 namespace BotUAC
 {
-    //public class TExtensions : ITExtensions, IEnumerator //, IEnumerable 
-    //{
-    //} // class TExtensions
-
-    public interface ITExtensions
-    {
-        int Count();
-        TExtension Item(int i);
-        //TExtension Enum();
-        void Add(TExtension inValue);
-        IEnumerator GetEnumerator();    // \
-        bool MoveNext();                //  |  для перебора элементов !
-        void Reset();                   // /
-        TExtension FindExtension(string inSymbol);
-        void Clear();
-    }
-
-    public class TExtensions : ITExtensions, IEnumerator //, IEnumerable 
+    [Serializable]
+    public class TExtensions : IEnumerator //, IEnumerable 
     {
         private ArrayList myAL = new ArrayList();       // array of TExtension
 

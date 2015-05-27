@@ -9,6 +9,7 @@ using System.Xml;
 
 namespace BotUAC
 {
+    [Serializable]
     public class TUser
     {
         private string userName;

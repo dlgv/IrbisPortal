@@ -11,24 +11,8 @@ using System.Collections;  // ArrayList
 
 namespace BotUAC
 {
-    //public class TActions : ITActions, IEnumerator //, IEnumerable 
-    //{
-    //} // class TActions
-
-    public interface ITActions
-    {
-        int Count();
-        TAction Item(int i);
-        //TAction Enum();
-        void Add(TAction inValue);
-        IEnumerator GetEnumerator();    // \
-        bool MoveNext();                //  |  для перебора элементов !
-        void Reset();                   // /
-        TAction FindAction(string inSymbol);
-        void Clear();
-    }
-
-    public class TActions : ITActions, IEnumerator //, IEnumerable 
+    [Serializable]
+    public class TActions : IEnumerator //, IEnumerable 
     {
         private ArrayList myAL = new ArrayList();       // array of TAction
 

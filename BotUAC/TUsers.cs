@@ -11,8 +11,7 @@ using System.Collections;  // ArrayList
 
 namespace BotUAC
 {
-
-
+    [Serializable]
     public class TUsers : IEnumerator //, IEnumerable 
     {
         private ArrayList myAL = new ArrayList();       // array of TUser

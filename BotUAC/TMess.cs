@@ -4,7 +4,8 @@ using System.Text;
 namespace BotUAC
 {
     // сообщения для вывода на экран
-    public class TMess : Exception
+    [Serializable]
+    public class TMess
     {
         // ошибка при загрузке (обработке) файла
         public const string Mess0001 = "Failed connecting to the application database.";   

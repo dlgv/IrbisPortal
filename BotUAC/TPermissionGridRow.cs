@@ -6,7 +6,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace BotUAC
 {
-    [Serializable()]
+    [Serializable]
     public class TPermissionGridRow
     {
         // http://aspdotnetcodebook.blogspot.com/2008/07/using-arraylist-as-datasource-for.html

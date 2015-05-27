@@ -25,14 +25,14 @@ namespace BotUAC
         private const int nColUserAllow = 2; // с 0 !
         private const int nColUserDeny = 3; // с 0 !
 
-        private bool bVariablesToSessionSaved = false;          // просто как индикатор сохранности переменных в сессии
+        private bool bVariablesToViewStateSaved = false;          // просто как индикатор сохранности переменных в Представлении состояния страницы
 
         private TAppSettings appSet = null;
         private TPermissionsSettings permSetOriginal = null;    // Первоначальная коллекция для Undo (вычитанная из файла или сохраненная в файле)
         private TPermissionsSettings permSetModify = null;      // Корректируемая коллекция
 
-        private TUser userModify = null;    // копия корректируемая
-        private TUser userModifyBeforeAdd = null;    // /
+        private TUser userModify = null;            // копия корректируемая
+        private TUser userModifyBeforeAdd = null;   // копия корректируемая перед нажатием кнопки Добавления (для возврата при отказе от добавления) 
 
         private string sActionModify = null;    // копия имени корректируемой акции (текущей в выпадающем списке)
 
@@ -47,6 +47,9 @@ namespace BotUAC
 
         protected void Page_Load(object sender, EventArgs e)
         {
+
+            // !!!!!!!!!!!! - грязные данные отслежиываются !!!!!!!!!!!!!!
+            //TrackViewState();
 
             // текущая аутентификация:
             //ResponseWriteInfo("Authentication: Authenticated = " + User.Identity.IsAuthenticated.ToString() + ", User = " + User.Identity.Name + ", Type = " + User.Identity.AuthenticationType);  
@@ -136,21 +139,22 @@ namespace BotUAC
             bool bNeedXmlAppLoad = false;
             bool bNeedXmlPerLoad = false;
             if (!IsPostBack)
-            {   // первоначальная загрузка стараницы 
+            {   // первоначальная загрузка страницы 
                 bNeedXmlAppLoad = true;
                 bNeedXmlPerLoad = true;
             }
             else
             {
-                // не первоначальная загрузка стариницы - вычитываем, если был сбой вычитки (null в сессии!)
-                if (Session["appSet"] == null || Session["permSetOriginal"] == null)   // сессия закрылась по таймауту - просто берем текущие ?
+                // не первоначальная загрузка стариницы - вычитываем только, если был сбой вычитки (null в Представлении состояния страницы!)
+                if (ViewState["appSet"] == null || ViewState["permSetOriginal"] == null) 
                 {
                     bNeedXmlAppLoad = true;
                     bNeedXmlPerLoad = true;
                 }
             }
-            // вычитка из файла/сессии
-            if (bNeedXmlAppLoad)
+            //-----------
+            // вычитка из файла + сохранение в Представлении состояния страницы
+            if (bNeedXmlAppLoad)  // надо загрузить настройки приложения из файла
             {
                 appSet = new TAppSettings(sIrbisXmlFileNameFull);
                 if (!appSet.Load())
@@ -161,15 +165,15 @@ namespace BotUAC
                     appSet = null; // !!! как признак незагруженной - ПОСЛЕ вывода сообщения !!!
                     return; //======================>
                 }
-                // сразу сохраняем в сессии
-                Session["appSet"] = appSet;
-                //ViewState.Add("appSet", appSet);
+                // сразу сохраняем в Представлении состояния страницы
+                ViewState["appSet"] = appSet;
             }
-            else 
+            else // НЕ надо загружать настройки приложения из файла - берем из Представления состояния страницы
             {
-                // берем из сессии
-                appSet = (TAppSettings)Session["appSet"];
+                // берем из Представления состояния страницы
+                appSet = (TAppSettings)ViewState["appSet"];
             }
+            //-----------
             if (bNeedXmlPerLoad)  // после загрузки для приложения !!!
             {
                 permSetOriginal = new TPermissionsSettings(appSet.PermissionsFileNameAndPath);  // после ЗАГРУЗКИ appSet !!!
@@ -183,18 +187,17 @@ namespace BotUAC
                 }
                 // копируем для коррекции
                 permSetModify = permSetOriginal.Clone();
-                // сразу сохраняем в сессии (Оригинал и Изменяемую !)
-                Session["permSetOriginal"] = permSetOriginal;
-                Session["permSetModify"] = permSetModify;
-                //ViewState.Add("permSetModify", permSetModify);
+                // сразу сохраняем в Предствлении формы (Оригинал и Изменяемую !)
+                ViewState["permSetOriginal"] = permSetOriginal;
+                ViewState["permSetModify"] = permSetModify;
             }
             else
             {
-                // берем из сессии
-                permSetOriginal = (TPermissionsSettings)Session["permSetOriginal"];
-                permSetModify = (TPermissionsSettings)Session["permSetModify"];
+                // берем из Представления состояния страницы
+                permSetOriginal = (TPermissionsSettings)ViewState["permSetOriginal"];
+                permSetModify = (TPermissionsSettings)ViewState["permSetModify"];
             }
-            // здесь В СЕССИИ и в Переменных всегда уже вычитанные xml 
+            // здесь В Представления состояния страницы и в Переменных всегда уже вычитанные xml 
             //---------------------------------------------------------------
 
             // убираем сообщение об ошибке (если было) 
@@ -238,8 +241,8 @@ namespace BotUAC
 
                 //----------------------------------------
                 // первоначальная загрузка - сохраняем переменные формы для след.загрузки !!!
-                // !!! сбой при вычитке после потери сеиии по таймауту !!!
-                FormVariablesSaveToSession();
+                // !!! без этого сохранения сбой при вычитке после потери сеccии по таймауту !!!
+                FormVariablesSaveToViewState();
 
                 // восстанавливаем состояние кнопок (после восстановлеиня из формы!)
                 SetUpdateScrMain(bUpdateScrMain);
@@ -249,18 +252,10 @@ namespace BotUAC
             else  // не первая загрузка страницы
             {
                 //----------------------------------------
-                // повторная загрузка - восстанавливаем переменные формы от предыд.загрузки !!!
-                // !!! сбой при вычитке после потери сессии по таймауту !!!
-                // !!! проверять "bVariablesToSessionSaved" - он всегда не null !!!
-                if (Session["bVariablesToSessionSaved"] == null)   // сессия закрылась по таймауту - просто берем текущие ?
-                {
-                    FormVariablesSaveToSession();
-                }
+                // восстанавливаем из Представления состояния страницы глобальные переменные
+                FormVariablesRestoreFromViewState();
 
-                // восстанавливаем из сессии глобальные переменные
-                FormVariablesRestoreFromSession();
-
-                // восстанавливаем состояние кнопок (после восстановлеиня из формы!)
+                // назначаем состояние кнопок (после восстановлеиня сохраненных переменных формы!)
                 SetUpdateScrMain(bUpdateScrMain);
                 SetUpdateScrAdd(bUpdateScrAdd);
 
@@ -268,18 +263,26 @@ namespace BotUAC
 
         }
 
-
-        protected void Page_Unload(object sender, EventArgs e)
+        protected void Page_PreRender(object sender, EventArgs e)
+        // !!! в Page_PreRender() сохранять в ViewState, 
+        //     если в событии позже, то вроде сохраняет нормально, 
+        //     но восстанавливает потом старое значкение 
+        //     (т.е. если позже - уже все сохранено) !!!
+        // Final event prior to rendering. 
+        //  The Page's PreRender is raised prior the PreRender for any controls.
+        //  This is the last opportunity to do things which will affect the appearance of the form.
+        //protected void Page_PreRenderComplete(object sender, EventArgs e)
+        //protected void Page_SaveStateComplete(object sender, EventArgs e)
+        //protected override void Render(HtmlTextWriter writer)
+        //protected void Page_Unload(object sender, EventArgs e)
         {
-
             //----------------------------------------
             // сохраняем переменные формы для след.загрузки !!!
             if (appSet != null)   // могло быть при ошибке начальной загрузки !
             {
-                FormVariablesSaveToSession();
+                FormVariablesSaveToViewState();
             }
         }
-
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
@@ -318,7 +321,7 @@ namespace BotUAC
             userModify = userModifyBeforeAdd.Clone();
             userModifyBeforeAdd = null;     // уничтожаем
             // выводим на экран все данные МОДИФИЦИРУЕМОГО пользователя
-            RefreshScreenForUser();
+            RefreshScreenFromModifyUser();
             // активируем список имени
             cbxUserName.Focus();
 
@@ -360,7 +363,7 @@ namespace BotUAC
             lblUserName_Error.Text = "";
 
             // выводим на экран все данные МОДИФИЦИРУЕМОГО пользователя
-            RefreshScreenForUser();
+            RefreshScreenFromModifyUser();
             // доступность кнопок нового пользователя  - от заполненности имени 
             btnSaveNew.Enabled = (txtUserName.Text.Trim().Length > 0);
             // активируем ввод имени !!!
@@ -428,7 +431,7 @@ namespace BotUAC
                 }
 
                 // выводим на экран все данные МОДИФИЦИРУЕМОГО пользователя
-                RefreshScreenForUser();
+                RefreshScreenFromModifyUser();
 
                 // восстанвливаем доступность кнопок в основном режимке - true (добавили нового в коллекцию) !!!
                 SetUpdateScrMain(true);
@@ -452,83 +455,9 @@ namespace BotUAC
         } // UserAddToCollection()
 
 
-        //---------------------------------------------------
-        // удалене модифицируемого пользователя из коллекцию
-        public bool UserDel()
-        {
-            bool bRet = false;
-            string sErr = "";
-            try
-            {
-                if (permSetModify == null)  // не должно быть !!!
-                {
-                    ResponseWriteError("Error UserDel(): PermissionSettingtngs not defined!");
-                    return bRet; //=================>
-                }
-                if (userModify == null)  // не должно быть !!!
-                {
-                    ResponseWriteError("Error UserDel(): Modify User not defined!");
-                    return bRet; //=================>
-                }
-
-                // !!! имя пользователя для УДАЛЕНИЯ (могди уже в форме перейти на другого !)
-                string sUserName = userModify.UserName;
-                if (sUserName == "") // не должно быть !!!
-                {
-                    ResponseWriteError("Error UserDel(): Modify User Name is Empty!");
-                    return bRet; //=================>
-                }
-
-                // удаляем пользователя из объекта
-                permSetModify.Users.Drop(sUserName);
-                // удаляем пользователя из списка
-                if (cbxUserName.Items.Count > 1)
-                {
-                    cbxUserName.Items.Remove(sUserName);
-                }
-                else  // последний элемент не удаляется обычным образом - просто чистим список !
-                {
-                    cbxUserName.Items.Clear();
-                }
-                // позиционируем список
-                if (cbxUserName.Items.Count > 0)
-                {
-                    cbxUserName.SelectedIndex = 0; // c 0 !
-                }
-
-                //-----------------
-                // спозиционировали список после удаления
-                // назначаем нового тек. пользователя по имени в списке ПОСЛЕ УДАЛЕНИЯ пользователя (с обновляем данных на экране для нового тек. пользователя)
-                UserModifySet(cbxUserName.Text, false);  // false - не сохранять текущего модиф.пользователя в коллекции перед назначением нового!!!
-                // выводим на экран все данные МОДИФИЦИРУЕМОГО пользователя
-                RefreshScreenForUser();
-
-                // восстанвливаем доступность кнопок в основном режимке - true (удалили из коллекцию) !!!
-                SetUpdateScrMain(true);
-
-            }
-            catch (Exception e)
-            {
-                sErr = sErr + (sErr == "" ? "" : " // ") + e.Message;
-                //MessageBox.Show("Error save User:" + Environment.NewLine +
-                //    Environment.NewLine + sErr, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            if (bRet)
-            {
-                sMainMessage = "";
-            }
-            else
-            {
-                sMainMessage = sErr;
-            }
-            return bRet; //=======================>
-
-        } // UserDel()
-
-
         //-----------------------------------------
         // выводит на экран все данные МОДИФИЦИРУЕМОГО пользователя
-        private void RefreshScreenForUser()
+        private void RefreshScreenFromModifyUser()
         {
             if (userModify != null)
             {
@@ -583,7 +512,7 @@ namespace BotUAC
                     }
                 } // по строкам сетки
             }
-        }  // RefreshScreenForUser()
+        }  // RefreshScreenFromModifyUser()
 
         //-----------------------------------------
         // выводим на экран Разрешения (сетку) МОДИФИЦИРУЕМОГО пользователя
@@ -1433,7 +1362,7 @@ namespace BotUAC
             }
 
             // выводим на экран все данные МОДИФИЦИРУЕМОГО пользователя
-            RefreshScreenForUser();
+            RefreshScreenFromModifyUser();
         }  // UserModifySet()
 
 
@@ -1480,59 +1409,125 @@ namespace BotUAC
         }  // UserApply()
 
 
-        //----------------------------------
-        // сохранение в Сессии глобальных переменныхформы
-        public void FormVariablesSaveToSession()
+        //---------------------------------------------------
+        // удалене модифицируемого пользователя из коллекцию
+        public bool UserDel()
         {
-            bVariablesToSessionSaved = true;          // просто как индикатор сохранности переменных в сессии
-            Session["bVariablesToSessionSaved"] = bVariablesToSessionSaved;
+            bool bRet = false;
+            string sErr = "";
+            try
+            {
+                if (permSetModify == null)  // не должно быть !!!
+                {
+                    ResponseWriteError("Error UserDel(): PermissionSettingtngs not defined!");
+                    return bRet; //=================>
+                }
+                if (userModify == null)  // не должно быть !!!
+                {
+                    ResponseWriteError("Error UserDel(): Modify User not defined!");
+                    return bRet; //=================>
+                }
 
-            Session["appSet"] = appSet;
-            Session["permSetOriginal"] = permSetOriginal;
-            Session["permSetModify"] = permSetModify;
-            Session["userModify"] = userModify;
-            Session["userModifyBeforeAdd"] = userModifyBeforeAdd;
-            Session["sActionModify"] = sActionModify;
-            Session["bUpdateXmlFile_to_RestartProc"] = bUpdateXmlFile_to_RestartProc;
-            Session["bUpdateScrMain"] = bUpdateScrMain;
-            Session["bUpdateScrAdd"] = bUpdateScrAdd;
-            Session["sMainMessage"] = sMainMessage;
+                // !!! имя пользователя для УДАЛЕНИЯ (могди уже в форме перейти на другого !)
+                string sUserName = userModify.UserName;
+                if (sUserName == "") // не должно быть !!!
+                {
+                    ResponseWriteError("Error UserDel(): Modify User Name is Empty!");
+                    return bRet; //=================>
+                }
+
+                // удаляем пользователя из объекта
+                permSetModify.Users.Drop(sUserName);
+                // удаляем пользователя из списка
+                if (cbxUserName.Items.Count > 1)
+                {
+                    cbxUserName.Items.Remove(sUserName);
+                }
+                else  // последний элемент не удаляется обычным образом - просто чистим список !
+                {
+                    cbxUserName.Items.Clear();
+                }
+                // позиционируем список
+                if (cbxUserName.Items.Count > 0)
+                {
+                    cbxUserName.SelectedIndex = 0; // c 0 !
+                }
+
+                //-----------------
+                // спозиционировали список после удаления
+                // назначаем нового тек. пользователя по имени в списке ПОСЛЕ УДАЛЕНИЯ пользователя (с обновляем данных на экране для нового тек. пользователя)
+                UserModifySet(cbxUserName.Text, false);  // false - не сохранять текущего модиф.пользователя в коллекции перед назначением нового!!!
+                // выводим на экран все данные МОДИФИЦИРУЕМОГО пользователя
+                RefreshScreenFromModifyUser();
+
+                // восстанвливаем доступность кнопок в основном режимке - true (удалили из коллекцию) !!!
+                SetUpdateScrMain(true);
+
+            }
+            catch (Exception e)
+            {
+                sErr = sErr + (sErr == "" ? "" : " // ") + e.Message;
+                //MessageBox.Show("Error save User:" + Environment.NewLine +
+                //    Environment.NewLine + sErr, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            if (bRet)
+            {
+                sMainMessage = "";
+            }
+            else
+            {
+                sMainMessage = sErr;
+            }
+            return bRet; //=======================>
+
+        } // UserDel()
+
+
+
+        //----------------------------------
+        // сохранение в Представлении состояния страницы глобальных переменных формы
+        public void FormVariablesSaveToViewState()
+        {
+            bVariablesToViewStateSaved = true;          // просто как индикатор сохранности переменных в Представлении состояния стриницы
+            ViewState["bVariablesToViewStateSaved"] = bVariablesToViewStateSaved;
+
+            // !!! ViewState - требует сериализации объектов
+            ViewState["appSet"] = appSet;
+            ViewState["permSetOriginal"] = permSetOriginal;
+            ViewState["permSetModify"] = permSetModify;
+            ViewState["userModify"] = userModify;
+            ViewState["user_ModifyBeforeAdd"] = userModifyBeforeAdd;
+            ViewState["sActionModify"] = sActionModify;
+            ViewState["bUpdateXmlFile_to_RestartProc"] = bUpdateXmlFile_to_RestartProc;
+            ViewState["bUpdateScrMain"] = bUpdateScrMain;
+            ViewState["bUpdateScrAdd"] = bUpdateScrAdd;
+            ViewState["sMainMessage"] = sMainMessage;
+
+        } // FormVariablesSaveToViewState()
+
+        //----------------------------------
+        // восстановление из Представления состояния страницы глобальных переменныхформы
+        public void FormVariablesRestoreFromViewState()
+        {
+            bVariablesToViewStateSaved = (bool)ViewState["bVariablesToViewStateSaved"];
 
             // !!! ViewState - требует сериализации объектов (доделать типы!)
-            //ViewState["appSet"] = appSet;
-            //ViewState["permSetModify"] = permSetModify;
-            //ViewState["userModify"] = userModify;
-            //ViewState["sActionModify"] = sActionModify;
-            //ViewState["bUpdateXmlFile_to_RestartProc"] = bUpdateXmlFile_to_RestartProc;
-            //ViewState["bUpdateScrMain"] = bUpdateScrMain;
-            //ViewState["sMainMessage"] = sMainMessage;
-        } // FormVariablesSaveToSession()
+            appSet = (TAppSettings)ViewState["appSet"];
+            permSetOriginal = (TPermissionsSettings)ViewState["permSetOriginal"];
+            permSetModify = (TPermissionsSettings)ViewState["permSetModify"];
+            userModify = (TUser)ViewState["userModify"];
+            if ((TUser)ViewState["user_ModifyBeforeAdd"] != null)
+            {
+                userModifyBeforeAdd = ((TUser)ViewState["user_ModifyBeforeAdd"]).Clone();
+            }
+            sActionModify = (string)ViewState["sActionModify"];
+            bUpdateXmlFile_to_RestartProc = (bool)ViewState["bUpdateXmlFile_to_RestartProc"];
+            bUpdateScrMain = (bool)ViewState["bUpdateScrMain"];
+            bUpdateScrAdd = (bool)ViewState["bUpdateScrAdd"];
+            sMainMessage = (string)ViewState["sMainMessage"];
 
-        //----------------------------------
-        // восстановление из Сессии глобальных переменныхформы
-        public void FormVariablesRestoreFromSession()
-        {
-            bVariablesToSessionSaved = (bool)Session["bVariablesToSessionSaved"];
+        } // FormVariablesRestoreFromViewState()
 
-            appSet = (TAppSettings)Session["appSet"];
-            permSetOriginal = (TPermissionsSettings)Session["permSetOriginal"];
-            permSetModify = (TPermissionsSettings)Session["permSetModify"];
-            userModify = (TUser)Session["userModify"];
-            userModifyBeforeAdd = (TUser)Session["userModifyBeforeAdd"];
-            sActionModify = (string)Session["sActionModify"];
-            bUpdateXmlFile_to_RestartProc = (bool)Session["bUpdateXmlFile_to_RestartProc"];
-            bUpdateScrMain = (bool)Session["bUpdateScrMain"];
-            bUpdateScrAdd = (bool)Session["bUpdateScrAdd"];
-            sMainMessage = (string)Session["sMainMessage"];
-            // !!! ViewState - требует сериализации объектов (доделать типы!)
-            //appSet = (TAppSettings)ViewState["appSet"]; 
-            //permSetModify = (TPermissionsSettings)ViewState["permSetModify"];
-            //userModify = (TUser)ViewState["userModify"];
-            //sActionModify = (string)ViewState["sActionModify"];
-            //bUpdateXmlFile_to_RestartProc = (bool)ViewState["bUpdateXmlFile_to_RestartProc"];
-            //bUpdateScrMain = (bool)ViewState["bUpdateScrMain"];
-            //sMainMessage = (string)ViewState["sMainMessage"];
-        } // FormVariablesRestoreFromSession()
 
         //----------------------------------
         // вывод в первю строку формы сообщения об ошибке

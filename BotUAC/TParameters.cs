@@ -11,7 +11,7 @@ using System.Collections;  // ArrayList
 
 namespace BotUAC
 {
-
+    [Serializable]
     public class TParameters : IEnumerator //, IEnumerable 
     {
         private ArrayList myAL = new ArrayList();       // array of TParameter

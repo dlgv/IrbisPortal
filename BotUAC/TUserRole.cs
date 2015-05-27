@@ -10,6 +10,7 @@ using System.Xml.Linq;          // XElement
 
 namespace BotUAC
 {
+    [Serializable]
     public class TUserRole
     {
         private string roleName;

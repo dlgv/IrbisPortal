@@ -11,24 +11,8 @@ using System.Collections;  // ArrayList
 
 namespace BotUAC
 {
-    //public class TUserRoles : ITUserRoles, IEnumerator //, IEnumerable 
-    //{
-    //} // class TUserRoles
-
-    public interface ITUserRoles
-    {
-        int Count();
-        TUserRole Item(int i);
-        //TUserRole Enum();
-        void Add(TUserRole inValue);
-        IEnumerator GetEnumerator();    // \
-        bool MoveNext();                //  |  для перебора элементов !
-        void Reset();                   // /
-        TUserRole FindUserRole(string inSymbol);
-        void Clear();
-    }
-
-    public class TUserRoles : ITUserRoles, IEnumerator //, IEnumerable 
+    [Serializable]
+    public class TUserRoles : IEnumerator //, IEnumerable 
     {
         private ArrayList myAL = new ArrayList();       // array of TUserRole
         private int Position = -1;

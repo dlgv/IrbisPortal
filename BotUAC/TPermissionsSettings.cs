@@ -12,6 +12,7 @@ using System.Collections;  // ArrayList
 
 namespace BotUAC
 {
+    [Serializable]
     class TPermissionsSettings
     {
 
