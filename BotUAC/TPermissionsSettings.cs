@@ -88,7 +88,7 @@ namespace BotUAC
                 {
                     sXmlFileNameFull = sXmlFileNameFull.Substring(0, sXmlFileNameFull.Length - 2); // отрезали косую в конце! 
                 }
-                // в свойства Объекта (потом можно забтрать из объекта)
+                // в свойства Объекта (потом можно забрать из объекта)
                 this.fileNameFull = sXmlFileNameFull;
 
                 // проверяем наличие файла

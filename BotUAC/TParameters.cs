@@ -50,7 +50,17 @@ namespace BotUAC
 
         public void Add(TParameter inObj)
         {
-            // append
+            // ДОПУСКАЕТ ДВОЙНИКОВ !!!
+            myAL.Add(inObj);
+        }
+
+        public void Set(TParameter inObj)
+        {
+            // НЕ ДОПУСКАЕТ ДВОЙНИКОВ !!!
+            // ищем старые - заменяем или добавляем, если старого нет
+            // удаляем старый
+            this.Drop(inObj);
+            // добавляем новый
             myAL.Add(inObj);
         }
 
@@ -60,6 +70,18 @@ namespace BotUAC
             if (inIndex >= 0 && inIndex < myAL.Count)  // allways !
             {
                 myAL.RemoveAt(inIndex);
+            }
+        }
+        public void Drop(TParameter parameter)      
+        {
+            // !!! physically remove from array !
+            //foreach (TPermission perm in myAL)
+            for (int i = myAL.Count - 1; i >= 0; i--)   /// удаляем С КОНЦА !!
+            {
+                if (((TParameter)myAL[i]).Name == parameter.Name && ((TParameter)myAL[i]).Value == parameter.Value)
+                {
+                    myAL.RemoveAt(i); break; //---------->
+                }
             }
         }
 

@@ -29,7 +29,8 @@ namespace BotUAC
                 if (nodeChild.Name.ToUpper() == "PERMISSION")
                 {
                     TPermission permission = new TPermission(nodeChild);
-                    this.myAL.Add(permission);
+                    //this.myAL.Add(permission);
+                    this.App(permission);
                 }
             }
         }
@@ -50,7 +51,7 @@ namespace BotUAC
 
         public void Add(TPermission Permission)
         {
-            // append
+            // просто добавляем в массив
             myAL.Add(Permission);
         }
 
@@ -70,6 +71,29 @@ namespace BotUAC
             //}
             // добавляем новые
             myAL.Add(Permission);
+        }
+
+        // "присоединяет" разрешение:
+        //  - если находит такое же старое по action + type, то к старому добавляет параметры входящего
+        //  - если не находит такое же старое по action + type, то просто добавляет
+        public void App(TPermission Permission)
+        {
+            // append
+            string sAction = Permission.Action;
+            string sType = Permission.Type;
+            TPermission oldPermission = null;
+            oldPermission = this.FindPermission(sAction, sType);
+            if (oldPermission == null) // не нашли старой - просто добаавляем 
+            {   
+                myAL.Add(Permission);
+            }
+            else // нашли старую - прибавляем к старой только ПАРАМЕТРЫ
+            {
+                foreach (TParameter par in Permission.Parameters)
+                {
+                    oldPermission.Parameters.Add(par);
+                }
+            }
         }
 
         public void Drop(int inIndex)                 // internal - только в классе или в той-же программе т(сборке)

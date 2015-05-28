@@ -38,6 +38,11 @@
     <user>
       <userName>GAAB</userName>
       <permissions>
+        <permission action="loadExtension" type="deny">
+          <parameters>
+            <parameter value="1010" name="extensionId" />
+          </parameters>
+        </permission>
         <permission action="loadExtension" type="allow">
           <parameters>
             <parameter name="extensionId" value="1000" />
@@ -49,8 +54,12 @@
           </parameters>
         </permission>
         <permission action="loadExtension" type="deny">
+          <parameters />
+        </permission>
+        <permission action="loadExtension" type="deny">
           <parameters>
-            <parameter name="extensionId" value="1003" />
+            <parameter value="1000" name="extensionId" />
+            <parameter value="1011" name="extensionId" />
           </parameters>
         </permission>
       </permissions>
