@@ -104,6 +104,24 @@ namespace BotUAC {
         protected global::System.Web.UI.WebControls.ImageButton btnAddUser;
         
         /// <summary>
+        /// lblDescription элемент управления.
+        /// </summary>
+        /// <remarks>
+        /// Автоматически создаваемое поле.
+        /// Для изменения переместите объявление поля из файла конструктора в файл кода программной части.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblDescription;
+        
+        /// <summary>
+        /// txtUserDescription элемент управления.
+        /// </summary>
+        /// <remarks>
+        /// Автоматически создаваемое поле.
+        /// Для изменения переместите объявление поля из файла конструктора в файл кода программной части.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtUserDescription;
+        
+        /// <summary>
         /// lblAction элемент управления.
         /// </summary>
         /// <remarks>
@@ -237,5 +255,14 @@ namespace BotUAC {
         /// Для изменения переместите объявление поля из файла конструктора в файл кода программной части.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBox ckbUpdated;
+        
+        /// <summary>
+        /// CurrentFocus элемент управления.
+        /// </summary>
+        /// <remarks>
+        /// Автоматически создаваемое поле.
+        /// Для изменения переместите объявление поля из файла конструктора в файл кода программной части.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField CurrentFocus;
     }
 }

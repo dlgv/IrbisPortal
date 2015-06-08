@@ -36,8 +36,8 @@
   </extensions>
   <users>
     <user>
-      <userName>F-01</userName>
-      <userDescription>первый</userDescription>
+      <userName>EEE</userName>
+      <userDescription>hjhjhjhjhjhj</userDescription>
       <permissions>
         <permission action="loadExtension" type="allow">
           <parameters />
@@ -48,8 +48,29 @@
       </permissions>
     </user>
     <user>
-      <userName>F-02</userName>
-      <userDescription>второй-02-03</userDescription>
+      <userName>GAAB</userName>
+      <userDescription>James Manning=4</userDescription>
+      <permissions>
+        <permission action="loadExtension" type="allow">
+          <parameters>
+            <parameter name="extensionId" value="1000" />
+            <parameter name="extensionId" value="1001" />
+            <parameter name="extensionId" value="1002" />
+            <parameter name="extensionId" value="1003" />
+            <parameter name="extensionId" value="1010" />
+            <parameter name="extensionId" value="1011" />
+          </parameters>
+        </permission>
+        <permission action="loadExtension" type="deny">
+          <parameters>
+            <parameter name="extensionId" value="1003" />
+          </parameters>
+        </permission>
+      </permissions>
+    </user>
+    <user>
+      <userName>OLEG01</userName>
+      <userDescription>Oleg Lychov</userDescription>
       <permissions>
         <permission action="loadExtension" type="allow">
           <parameters />
@@ -57,13 +78,17 @@
         <permission action="loadExtension" type="deny">
           <parameters />
         </permission>
-        <permission action="unloadExtension" type="allow">
+      </permissions>
+    </user>
+    <user>
+      <userName>OLEG02</userName>
+      <userDescription>oleg-2</userDescription>
+      <permissions>
+        <permission action="loadExtension" type="allow">
           <parameters />
         </permission>
-        <permission action="unloadExtension" type="deny">
-          <parameters>
-            <parameter name="extensionId" value="1000" />
-          </parameters>
+        <permission action="loadExtension" type="deny">
+          <parameters />
         </permission>
       </permissions>
     </user>

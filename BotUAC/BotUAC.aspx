@@ -46,8 +46,7 @@
             <asp:TextBox ID="txtUserName" runat="server"  AutoPostBack="true" 
                style="position:absolute;top: 39px; left: 104px; width: 146px;" 
                 Visible="false" OnTextChanged="txtUserName_TextChanged"
-                CssClass="uppercase" >
-               </asp:TextBox>
+                CssClass="uppercase" ></asp:TextBox>
 
             <asp:Label ID="lblUserName_Error" runat="server"  
                style="position: absolute; top: 41px; left: 274px;" ForeColor="Red"
@@ -65,18 +64,28 @@
             <asp:ImageButton ID="btnAddUser" style="position:absolute; top: 40px; left: 259px;"
             runat="server" ImageUrl="~/Resources/Button_Add_16x16.png" 
                 onclick="btnAddUser_Click" />
+
+
+            <asp:Label ID="lblDescription" runat="server" Text="Description"  
+                style="position: absolute; top: 74px; left: 18px; width: 80px; ">
+                </asp:Label>
+
+            <asp:TextBox ID="txtUserDescription" runat="server"  AutoPostBack="true" 
+               style="position:absolute;top: 72px; left: 104px; width: 146px;" 
+                ontextchanged="txtUserDescription_TextChanged" ></asp:TextBox>
+
             
             <asp:Label ID="lblAction" runat="server" Text="Action"  
-                style="position: absolute; top: 74px; left: 18px; width: 49px; ">
+                style="position: absolute; top: 107px; left: 18px; width: 49px; ">
                 </asp:Label>
             
             <asp:DropDownList ID="cbxAction" runat="server" AutoPostBack="True" 
-                style="position:absolute; top: 74px; left: 104px; width: 150px;" 
-                onselectedindexchanged="cbxAction_SelectedIndexChanged">
+                style="position:absolute; top: 107px; left: 104px; width: 150px;" 
+                onselectedindexchanged="cbxAction_SelectedIndexChanged" >
                 </asp:DropDownList>
             
             <asp:Panel ID="panGrid" style="position:absolute; 
-                top: 112px; left: 18px; height: 250px; width: 347px;" runat="server" 
+                top: 145px; left: 18px; height: 250px; width: 347px;" runat="server" 
                 BorderStyle="None" >
                 <!-- style="position:absolute; border: 1px solid #000;  -->
                 <!-- панель для сетки с "заголовком" -->                        
@@ -112,7 +121,7 @@
                         AlternatingRowStyle-BackColor="WhiteSmoke" 
                         Height="100px"
                         Width="349px"
-                        runat="server" BorderStyle="None">
+                        runat="server" BorderStyle="None" >
                         
                         <PagerStyle   
                             BackColor="Crimson"   
@@ -166,36 +175,44 @@
             </asp:Panel>
             
             <asp:Button ID="btnCancelNew" runat="server" Text="Cancel New" 
-                style="position:absolute; top: 112px; left: 378px; width: 92px;" 
+                style="position:absolute; top: 145px; left: 378px; width: 92px;" 
                 onclick="btnCancelNew_Click" Visible="False" />
                   
             <asp:Button ID="btnSaveNew" runat="server" Text="Save New" 
-                style="position:absolute; top: 144px; left: 377px; width: 92px; right: 499px;" 
+                style="position:absolute; top: 177px; left: 377px; width: 92px; right: 499px;" 
                 OnClientClick="setOnBeforeUnload(false)"
                 onclick="btnSaveNew_Click" Visible="False" />
                   
 
             <asp:Button ID="btnCancel" runat="server" Text="Cancel" 
-                style="position:absolute; top: 112px; left: 378px; width: 92px;" 
+                style="position:absolute; top: 145px; left: 378px; width: 92px;" 
                 OnClientClick="setOnBeforeUnload(false)"
                 onclick="btnCancel_Click" />
                     
             <asp:Button ID="btnSave" runat="server" Text="Save" 
-                style="position:absolute; top: 144px; left: 377px; width: 92px; right: 499px;" 
+                style="position:absolute; top: 177px; left: 377px; width: 92px; right: 499px;" 
                 onclick="btnSave_Click"  />
 
             <asp:Label ID="lblSave_Error" runat="server"  
-               style="position: absolute; top: 144px; left: 475px;" ForeColor="Red"
+               style="position: absolute; top: 177px; left: 475px;" ForeColor="Red"
                ></asp:Label>
 
             <!--
             <asp:CheckBox ID="ckbUpdated"  runat="server" AutoPostBack="true" Checked="false"  visible="true"  /> 
             -->
 
+            <!--
+            сохранение и восстановление положения фокуса
+            http://codeverge.com/asp.net.web-forms/problem-finding-the-active-element-on-a-web/343477            
+                jscript
+            -->
+            <!--
+            <asp:HiddenField ID="CurrentFocus" runat="server" value="" />
+            -->
+            
+            
     </div>
-    
-                    
-                    
+
 
     </form>
 
@@ -271,7 +288,9 @@
                        (idName == "btnAddUser") || (idName == "btnDelUser") ||
                        (idName == "btnSave") || (idName == "btnCancel") ||
                        (idName == "btnSaveNew") || (idName == "btnCancelNew") ||
-                        bRavno1 || bRavno2 || idName == "txtUserName")
+                       (idName == "txtUserDescription") ||
+                       (idName == "txtUserName") ||
+                        bRavno1 || bRavno2 )
                     {
                         //alert("2: idName = " + idName);
 	                    str = elems[i].getAttribute("onClick", 0);

@@ -65,7 +65,7 @@ namespace BotUAC
             }
         }
 
-        internal int IndexByUserName(string inRoleName)             // internal - только в классе или в той-же программе т(сборке)
+        internal int IndexByRoleName(string inRoleName)             // internal - только в классе или в той-же программе т(сборке)
         {
             int nIndex = -1;    // defaul -1 (not found)
             for (int n = 0; n < myAL.Count; n++)

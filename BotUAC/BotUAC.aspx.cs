@@ -34,7 +34,7 @@ namespace BotUAC
         private TUser userModify = null;            // копия корректируемая
         private TUser userModifyBeforeAdd = null;   // копия корректируемая перед нажатием кнопки Добавления (для возврата при отказе от добавления) 
 
-        private string sActionModify = null;    // копия имени корректируемой акции (текущей в выпадающем списке)
+        private string sActionModify = null;        // копия имени корректируемой акции (текущей в выпадающем списке)
 
         private bool bUpdateXmlFile_to_RestartProc = false;       // признак измененности файла xml (данные сохранялись в файле) -  для перезапуска заданного процесса при завершении работы с формой
 
@@ -44,9 +44,15 @@ namespace BotUAC
         bool bUpdateScrAdd = false;
         string sMainMessage = null;
 
+        //// восстановление фокуса
+        //protected string Focus;
+        //protected string ControlType;
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            //// восстановление фокуса
+            //Focus = "TextBox1";
+            //ControlType = "TextArea";
 
             // !!!!!!!!!!!! - грязные данные отслежиываются !!!!!!!!!!!!!!
             //TrackViewState();
@@ -153,7 +159,7 @@ namespace BotUAC
                 }
             }
             //-----------
-            // вычитка из файла + сохранение в Представлении состояния страницы
+            // вычитка из файла конфиг.приложения + сохранение в Представлении состояния страницы
             if (bNeedXmlAppLoad)  // надо загрузить настройки приложения из файла
             {
                 appSet = new TAppSettings(sIrbisXmlFileNameFull);
@@ -221,6 +227,7 @@ namespace BotUAC
 
                 // заголовки выпадающих списков
                 lblUserName.Font.Bold = true;
+                lblDescription.Font.Bold = true;
                 lblAction.Font.Bold = true;
 
                 // "заголовок" сетки жирным
@@ -237,6 +244,7 @@ namespace BotUAC
 
                 //==========================
                 // начальная установка (первая загрузка формы) пользователя для его коррекции
+                // (пустое имя - берется первый по списку)
                 UserSetBegin("", "");   // "" - имя пользователя для позиционирования (при пустом - первый по алфавитному списку)
 
                 //----------------------------------------
@@ -351,16 +359,18 @@ namespace BotUAC
             btnSaveNew.Visible = true;
             // открываем текст ввод нового имени - вместо выпадающего списка
             txtUserName.Visible = true;
+            txtUserName.TabIndex = 0;
             lblUserName_Error.Visible = true;
 
             //---------------
             // при добавлении создаем нового пользователя для коррекции
-            userModify = new TUser("", "", new TPermissions());  
+            userModify = new TUser("", "", "", new TPermissions());  
             //---------------
 
             // очищаем поля формы - разрешения
             txtUserName.Text = "";      // иначе останется от прошлого ввода, но потом выведем для изменяемого - можно не делать
             lblUserName_Error.Text = "";
+            txtUserDescription.Text = "";      // иначе останется от прошлого ввода, но потом выведем для изменяемого - можно не делать
 
             // выводим на экран все данные МОДИФИЦИРУЕМОГО пользователя
             RefreshScreenFromModifyUser();
@@ -396,6 +406,7 @@ namespace BotUAC
 
                 // доопределяем нового (модифицированного) по вводу с экрана
                 userModify.UserName = txtUserName.Text;
+                userModify.UserDescription = txtUserDescription.Text;
 
                 // после Добавлеия пользователя переносим текущее состояние пользователя c экрана в объект-модификации (если не сменили на экране пользователя !)
                 UserApply();  // берем Роль и Разрешения сетки с экрана в модифицируемого 
@@ -483,6 +494,9 @@ namespace BotUAC
                 //    }
                 //}
 
+                // описание
+                txtUserDescription.Text = userModify.UserDescription;
+
                 // операция
                 //  --- оставляем прежнюю
 
@@ -496,6 +510,7 @@ namespace BotUAC
                 // рзрешаем / запрещаем дедактирование (нельзя, если нет пользовтелей - пустой выпадающий список!)
                 bool bEnabled = ((cbxUserName.Visible && cbxUserName.Text.Trim() != "") || (txtUserName.Visible));
                 cbxUserName.Enabled = bEnabled;
+                txtUserDescription.Enabled = bEnabled;
                 cbxAction.Enabled = bEnabled;
                 btnAllow.Enabled = bEnabled;
                 btnDeny.Enabled = bEnabled;
@@ -1150,7 +1165,7 @@ namespace BotUAC
                 return; //=============>
             }
 
-            // запоминаем имя текущего редуктируемого старого пользователя
+            // запоминаем имя текущего редактируемого старого пользователя
             string sUserName = cbxUserName.Text;
             string sActionName = cbxAction.Text;
 
@@ -1216,6 +1231,19 @@ namespace BotUAC
             //    ResponseWriteError(TMess.Mess0009 + " " + permSetModify.FileNameFull); // "<br>" + 
             //    return; //======================>
             //}
+
+            //-----------------------------
+            // Описание пользователя - по имени текущего пользователя в списке выбора пользователя
+            string sUserName = cbxUserName.Text;
+            TUser userCurrent = permSetModify.Users.FindUser(sUserName);
+            if (userCurrent != null)
+            {
+                txtUserDescription.Text = userCurrent.UserDescription;
+            }
+            else
+            {
+                txtUserDescription.Text = "";
+            }
 
             //-----------------------------
             // Операции - заполняем выпадаюший список
@@ -1353,12 +1381,12 @@ namespace BotUAC
                 else  // не должно быть !!!
                 {
                     ResponseWriteError("Erro UserModifySet(): Lost user " + UserName + "!");
-                    userModify = new TUser("", "", new TPermissions());
+                    userModify = new TUser("", "", "", new TPermissions());
                 }
             }
             else
             {
-                userModify = new TUser("", "", new TPermissions());
+                userModify = new TUser("", "", "", new TPermissions());
             }
 
             // выводим на экран все данные МОДИФИЦИРУЕМОГО пользователя
@@ -1376,6 +1404,9 @@ namespace BotUAC
             {
                 userModify.UserName = txtUserName.Text;   // на всякий случай
             }
+
+            // назначаем Описание
+            userModify.UserDescription = txtUserDescription.Text;
 
             // назначаем Роль
             //userModify.UserRole = sUserRole;
@@ -1503,6 +1534,11 @@ namespace BotUAC
             ViewState["bUpdateScrAdd"] = bUpdateScrAdd;
             ViewState["sMainMessage"] = sMainMessage;
 
+            // сохраняем фокус - восстановим при загрузке !!!
+            //string sFocus = "";
+            
+
+
         } // FormVariablesSaveToViewState()
 
         //----------------------------------
@@ -1543,15 +1579,44 @@ namespace BotUAC
         public void ResponseWriteInfo(string sMessage)
         {
             Response.Write(sMessage);
-        } 
+        }
 
+
+        protected void txtUserDescription_TextChanged(object sender, EventArgs e)
+        {
+            // !!! отрабатывает только ПО Enter или ПРИ ПЕРЕХОДЕ на другой контрол !!!
+            //  !!! больше негде перехватить изменение значения  - НЕТ нажатия клавиатуры !!!
+
+            
+            // нормируем значение 
+            txtUserDescription.Text = txtUserDescription.Text.Trim();
+
+            //// проверяем поле Описание пользователя
+            //bool isValid;
+            //isValid = true; // ValidateUserName();
+            //btnSave.Enabled = isValid;
+
+            // обработка события изменения Описания
+            if (txtUserName.Visible)
+            {
+                SetUpdateScrAdd(true);
+            }
+            else
+            {
+                SetUpdateScrMain(true);
+            }
+
+            //// восстановление фокуса
+            //Focus = "txtUserDescription";
+            //ControlType = "TextArea";
+        } 
 
 
         //#######################################################################
         // !!! ПОСЛЕДНЯЯ - НЕ УДАЛЯТЬ, чтобы не стирался комментарий к закрывабщей процедуру скобке !!!
         public void Empty()
         {
-        } 
+        }
 
     }  // WebFormBotUAC
 

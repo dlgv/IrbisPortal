@@ -163,6 +163,8 @@ namespace BotUAC
             myAL.Clear();
         }
 
+        //------------------------------
+        // Like() - проверяет только ПОИМЕННЫЙ состав списков !!!
         public bool Like(TUsers users)
         {
             bool bRet = true;
