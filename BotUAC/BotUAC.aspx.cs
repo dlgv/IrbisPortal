@@ -406,7 +406,8 @@ namespace BotUAC
 
                 // доопределяем нового (модифицированного) по вводу с экрана
                 userModify.UserName = txtUserName.Text;
-                userModify.UserDescription = txtUserDescription.Text;
+                string s = txtUserDescription.Text.Trim();
+                userModify.UserDescription = s.Substring(0, Math.Min( s.Length, TUser.UserDescriptionMaxLength));  // qqq
 
                 // после Добавлеия пользователя переносим текущее состояние пользователя c экрана в объект-модификации (если не сменили на экране пользователя !)
                 UserApply();  // берем Роль и Разрешения сетки с экрана в модифицируемого 
@@ -430,7 +431,7 @@ namespace BotUAC
                 cbxUserName.Items.Add(userModify.UserName);
                 // сортируем элементы списка Имен
                 SortCbxItems(cbxUserName);
-                // qqq позиционируем в списке имен пользователей на добавленного
+                // позиционируем в списке имен пользователей на добавленного
                 int index = cbxUserName.Items.IndexOf(cbxUserName.Items.FindByText(userModify.UserName));
                 if (index >= 0)  // должно быть!
                 {
@@ -1406,7 +1407,8 @@ namespace BotUAC
             }
 
             // назначаем Описание
-            userModify.UserDescription = txtUserDescription.Text;
+            string s = txtUserDescription.Text.Trim();
+            userModify.UserDescription = s.Substring(0, Math.Min(s.Length, TUser.UserDescriptionMaxLength));  // qqq
 
             // назначаем Роль
             //userModify.UserRole = sUserRole;
@@ -1589,7 +1591,8 @@ namespace BotUAC
 
             
             // нормируем значение 
-            txtUserDescription.Text = txtUserDescription.Text.Trim();
+            string s = txtUserDescription.Text.Trim();
+            txtUserDescription.Text = s.Substring(0, Math.Min(s.Length, TUser.UserDescriptionMaxLength));  // qqq
 
             //// проверяем поле Описание пользователя
             //bool isValid;

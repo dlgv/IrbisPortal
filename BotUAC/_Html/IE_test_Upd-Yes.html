@@ -1,0 +1,305 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head><title>
+	BotUAC
+</title>   
+
+
+    
+    
+    
+    <style type="text/css">
+        .FixedHeader {
+            position: absolute;
+            font-weight: normal;
+            vertical-align:text-bottom;
+        }      
+    </style>
+    <style type="text/css">
+        .uppercase
+        {
+            text-transform: uppercase;
+        }    
+    </style>
+</head>
+<body>
+    <form name="form1" method="post" action="BotUAC.aspx" id="form1">
+<div>
+<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="" />
+<input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value="" />
+<input type="hidden" name="__LASTFOCUS" id="__LASTFOCUS" value="" />
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUKLTcxNTQwNTkyMA8WFh4GYXBwU2V0MugCAAEAAAD/////AQAAAAAAAAAMAgAAAD5Cb3RVQUMsIFZlcnNpb249MS4wLjAuMTYsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAE0JvdFVBQy5UQXBwU2V0dGluZ3MJAAAAB3BvcnROdW0HbG9nc0RpcglldmVudE5hbWUJbXV0ZXhOYW1lGnBlcm1pc3Npb25zRmlsZU5hbWVBbmRQYXRoF3Blcm1pc3Npb25zRmlsZU5hbWVPbmx5CGZpbGVOYW1lDGZpbGVOYW1lRnVsbAdtZXNzYWdlAAEBAQEBAQEBCAIAAADYBAAABgMAAAAGLi9sb2dzBgQAAAAACQQAAAAGBQAAABhjOlxpcmJpc1xwZXJtaXNzaW9ucy54bWwGBgAAAA9wZXJtaXNzaW9ucy54bWwJBAAAAAYIAAAAFGM6XFxpcmJpc1xcaXJiaXMueG1sCQQAAAALHgp1c2VyTW9kaWZ5Ms8FAAEAAAD/////AQAAAAAAAAAMAgAAAD5Cb3RVQUMsIFZlcnNpb249MS4wLjAuMTYsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAADEJvdFVBQy5UVXNlcgQAAAAIdXNlck5hbWUPdXNlckRlc2NyaXB0aW9uCHVzZXJSb2xlC3Blcm1pc3Npb25zAQEBBBNCb3RVQUMuVFBlcm1pc3Npb25zAgAAAAIAAAAGAwAAAARGLTAxBgQAAAAHZjFmMWYxZgoJBQAAAAUFAAAAE0JvdFVBQy5UUGVybWlzc2lvbnMCAAAABG15QUwIUG9zaXRpb24DABxTeXN0ZW0uQ29sbGVjdGlvbnMuQXJyYXlMaXN0CAIAAAAJBgAAAP////8EBgAAABxTeXN0ZW0uQ29sbGVjdGlvbnMuQXJyYXlMaXN0AwAAAAZfaXRlbXMFX3NpemUIX3ZlcnNpb24FAAAICAkHAAAAAgAAAAIAAAAQBwAAAAQAAAAJCAAAAAkJAAAADQIFCAAAABJCb3RVQUMuVFBlcm1pc3Npb24DAAAABmFjdGlvbgR0eXBlCnBhcmFtZXRlcnMBAQQSQm90VUFDLlRQYXJhbWV0ZXJzAgAAAAIAAAAGCgAAAA1sb2FkRXh0ZW5zaW9uBgsAAAAFYWxsb3cJDAAAAAEJAAAACAAAAAYNAAAADWxvYWRFeHRlbnNpb24GDgAAAARkZW55CQ8AAAAFDAAAABJCb3RVQUMuVFBhcmFtZXRlcnMCAAAABG15QUwIUG9zaXRpb24DABxTeXN0ZW0uQ29sbGVjdGlvbnMuQXJyYXlMaXN0CAIAAAAJEAAAAP////8BDwAAAAwAAAAJEQAAAP////8BEAAAAAYAAAAJEgAAAAAAAAAAAAAAAREAAAAGAAAACRIAAAAAAAAAAAAAABASAAAAAAAAAAseGmJWYXJpYWJsZXNUb1ZpZXdTdGF0ZVNhdmVkZx4Mc01haW5NZXNzYWdlZB4UdXNlcl9Nb2RpZnlCZWZvcmVBZGRkHg1wZXJtU2V0TW9kaWZ5MpMZAAEAAAD/////AQAAAAAAAAAMAgAAAD5Cb3RVQUMsIFZlcnNpb249MS4wLjAuMTYsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAG0JvdFVBQy5UUGVybWlzc2lvbnNTZXR0aW5ncwcAAAAKZXh0ZW5zaW9ucwdhY3Rpb25zCXVzZXJSb2xlcwV1c2VycwhmaWxlTmFtZQxmaWxlTmFtZUZ1bGwHbWVzc2FnZQQEBAQBAQESQm90VUFDLlRFeHRlbnNpb25zAgAAAA9Cb3RVQUMuVEFjdGlvbnMCAAAAEUJvdFVBQy5UVXNlclJvbGVzAgAAAA1Cb3RVQUMuVFVzZXJzAgAAAAIAAAAJAwAAAAkEAAAACQUAAAAJBgAAAAYHAAAAGGM6XGlyYmlzXHBlcm1pc3Npb25zLnhtbAYIAAAAGGM6XGlyYmlzXHBlcm1pc3Npb25zLnhtbAYJAAAAAAUDAAAAEkJvdFVBQy5URXh0ZW5zaW9ucwIAAAAEbXlBTAhQb3NpdGlvbgMAHFN5c3RlbS5Db2xsZWN0aW9ucy5BcnJheUxpc3QIAgAAAAkKAAAA/////wUEAAAAD0JvdFVBQy5UQWN0aW9ucwIAAAAEbXlBTAhQb3NpdGlvbgMAHFN5c3RlbS5Db2xsZWN0aW9ucy5BcnJheUxpc3QIAgAAAAkLAAAA/////wUFAAAAEUJvdFVBQy5UVXNlclJvbGVzAgAAAARteUFMCFBvc2l0aW9uAwAcU3lzdGVtLkNv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////AQAAAAAAAAAMAgAAAD5Cb3RVQUMsIFZlcnNpb249MS4wLjAuMTYsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAG0JvdFVBQy5UUGVybWlzc2lvbnNTZXR0aW5ncwcAAAAKZXh0ZW5zaW9ucwdhY3Rpb25zCXVzZXJSb2xlcwV1c2VycwhmaWxlTmFtZQxmaWxlTmFtZUZ1bGwHbWVzc2FnZQQEBAQBAQESQm90VUFDLlRFeHRlbnNpb25zAgAAAA9Cb3RVQUMuVEFjdGlvbnMCAAAAEUJvdFVBQy5UVXNlclJvbGVzAgAAAA1Cb3RVQUMuVFVzZXJzAgAAAAIAAAAJAwAAAAkEAAAACQUAAAAJBgAAAAYHAAAAGGM6XGlyYmlzXHBlcm1pc3Npb25zLnhtbAYIAAAAGGM6XGlyYmlzXHBlcm1pc3Npb25zLnhtbAYJAAAAAAUDAAAAEkJvdFVBQy5URXh0ZW5zaW9ucwIAAAAEbXlBTAhQb3NpdGlvbgMAHFN5c3RlbS5Db2xsZWN0aW9ucy5BcnJheUxpc3QIAgAAAAkKAAAA/////wUEAAAAD0JvdFVBQy5UQWN0aW9ucwIAAAAEbXlBTAhQb3NpdGlvbgMAHFN5c3RlbS5Db2xsZWN0aW9ucy5BcnJheUxpc3QIAgAAAAkLAAAA/////wUFAAAAEUJvdFVBQy5UVXNlclJvbGVzAgAAAARteUFMCFBvc2l0aW9uAwAcU3lzdGVtLkNvbGxlY3Rpb25zLkFycmF5TGlzdAgCAAAACQwAAAD/////BQYAAAANQm90VUFDLlRVc2VycwIAAAAEbXlBTAhQb3NpdGlvbgMAHFN5c3RlbS5Db2xsZWN0aW9ucy5BcnJheUxpc3QIAgAAAAkNAAAA/////wQKAAAAHFN5c3RlbS5Db2xsZWN0aW9ucy5BcnJheUxpc3QDAAAABl9pdGVtcwVfc2l6ZQhfdmVyc2lvbgUAAAgICQ4AAAAGAAAABgAAAAELAAAACgAAAAkPAAAAAgAAAAIAAAABDAAAAAoAAAAJEAAAAAAAAAAAAAAAAQ0AAAAKAAAACREAAAAFAAAABQAAABAOAAAACAAAAAkSAAAACRMAAAAJFAAAAAkVAAAACRYAAAAJFwAAAA0CEA8AAAAEAAAACRgAAAAJ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MWYxZjFkZAIRDw8WBh8LBQZBY3Rpb24fDGcfDQKAEGRkAhMPEGQQFQINbG9hZEV4dGVuc2lvbg91bmxvYWRFeHRlbnNpb24VAg1sb2FkRXh0ZW5zaW9uD3VubG9hZEV4dGVuc2lvbhQrAwJnZxYBZmQCFQ9kFgQCAQ9kFgYCAQ8PFgYfCwUJRXh0ZW5zaW9uHwxnHw0CgBBkZAIDDw8WBh8PBQlDaGVjayBBbGwfDGcfDQKAEGRkAgUPDxYGHw8FCUNoZWNrIEFsbB8MZx8NAoAQZGQCAw9kFgICAQ88KwANAQAPFgQeC18hRGF0YUJvdW5kZx4LXyFJdGVtQ291bnQCBmQWAmYPZBYQZg8PFgIfDmhkZAIBD2QWBgIBDw8WAh8LBQtTaXplV2F0Y2hlcmRkAgIPZBYCAgEPEA8WAh4HQ2hlY2tlZGhkZGRkAgMPZBYCAgEPEA8WAh8TaGRkZGQCAg9kFgYCAQ8PFgIfCwUKTW9jU2Nhbm5lcmRkAgIPZBYCAgEPEA8WAh8TaGRkZGQCAw9kFgICAQ8QDxYCHxNoZGRkZAIDD2QWBgIBDw8WAh8LBQxDbG9zZU1hbmFnZXJkZAICD2QWAgIBDxAPFgIfE2hkZGRkAgMPZBYCAgEPEA8WAh8TaGRkZGQCBA9kFgYCAQ8PFgIfCwUST3BlblByaWNlRXN0aW1hdG9yZGQCAg9kFgICAQ8QDxYCHxNoZGRkZAIDD2QWAgIBDxAPFgIfE2hkZGRkAgUPZBYGAgEPDxYCHwsFClNpemVGaW5kZXJkZAICD2QWAgIBDxAPFgIfE2hkZGRkAgMPZBYCAgEPEA8WAh8TaGRkZGQCBg9kFgYCAQ8PFgIfCwULRnJvbnRSdW5uZXJkZAICD2QWAgIBDxAPFgIfE2hkZGRkAgMPZBYCAgEPEA8WAh8TaGRkZGQCBw8PFgIfDmhkZAIXDw8WBB8LBQZDYW5jZWwfDwUTQ2FuY2VsIGFkZCBuZXcgVXNlcmRkAhkPDxYGHwsFA0FkZB8PBQ1TYXZlIG5ldyBVc2VyHgdFbmFibGVkaGRkAhsPDxYGHwsFBFVuZG8fDwUSQ2FuY2VsIGNoYW5nZSBVc2VyHxRnZGQCHQ8PFgYfCwUEU2F2ZR8PBQlTYXZlIFVzZXIfFGdkZAIfDw8WAh8LZWRkGAIFHl9fQ29udHJvbHNSZXF1aXJlUG9zdEJhY2tLZXlfXxYPBQpidG5EZWxVc2VyBQpidG5BZGRVc2VyBRhHcmlkVmlldzEkY3RsMDIkY2tiQWxsb3cFF0dyaWRWaWV3MSRjdGwwMiRja2JEZW55BRhHcmlkVmlldzEkY3RsMDMkY2tiQWxsb3cFF0dyaWRWaWV3MSRjdGwwMyRja2JEZW55BRhHcmlkVmlldzEkY3RsMDQkY2tiQWxsb3cFF0dyaWRWaWV3MSRjdGwwNCRja2JEZW55BRhHcmlkVmlldzEkY3RsMDUkY2tiQWxsb3cFF0dyaWRWaWV3MSRjdGwwNSRja2JEZW55BRhHcmlkVmlldzEkY3RsMDYkY2tiQWxsb3cFF0dyaWRWaWV3MSRjdGwwNiRja2JEZW55BRhHcmlkVmlldzEkY3RsMDckY2tiQWxsb3cFF0dyaWRWaWV3MSRjdGwwNyRja2JEZW55BQpja2JVcGRhdGVkBQlHcmlkVmlldzEPPCsACgEIAgFkmZnis7fcuwp+TmoB/q48bAKKkrc=" />
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+var theForm = document.forms['form1'];
+if (!theForm) {
+    theForm = document.form1;
+}
+function __doPostBack(eventTarget, eventArgument) {
+    if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
+        theForm.__EVENTTARGET.value = eventTarget;
+        theForm.__EVENTARGUMENT.value = eventArgument;
+        theForm.submit();
+    }
+}
+//]]>
+</script>
+
+
+<script src="/WebResource.axd?d=7EC-mHjWNsj2HEf99faPNg2&amp;t=635657406148437500" type="text/javascript"></script>
+
+<div>
+
+	<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="/wEWHwLWtIjpCAKnltaKCALTuNOmDwLTuKfaBgLYgvjiCQLYguziCQLYguDiCQLbgc/6AQK6gdPDDwKa79ziCAK0s778DALhjOWIBQKFu5WMCwKn0/aECgK879j3DwLT7+TQBQL65OTyAQLEkdHcDwKPnPGkCwKB7uWWCQLM+IXfBAL6mJCMCwLZ/rj/DQLf16iIBwK+vdH7CQKwoM+7BgKj4YBaApD0z+sFApy3uJIMAtTl3OQHApqr43noCzZ7Epu+woQukby750hpjRHAwQ==" />
+</div>
+
+    
+    
+    <div id="divMain">
+    
+            <span id="lblUserName" style="font-weight:bold;position: absolute; top: 41px; left: 17px; width: 49px; ">User</span>
+
+            
+
+            
+
+            <select name="cbxUserName" onchange="javascript:setTimeout('__doPostBack(\'cbxUserName\',\'\')', 0)" id="cbxUserName" style="position:absolute; top: 39px; left: 104px; width: 150px;">
+	<option selected="selected" value="F-01">F-01</option>
+	<option value="F-02">F-02</option>
+	<option value="NEW-01">NEW-01</option>
+	<option value="NEW-02">NEW-02</option>
+	<option value="NEW-03">NEW-03</option>
+
+</select>
+
+            <input type="image" name="btnDelUser" id="btnDelUser" title="Delete current User" src="Resources/Button_Del_16x16.png" onclick="return confirm('Are you sure you want to delete the user?');" style="border-width:0px;position:absolute; top: 41px; left: 280px;" />
+            
+            <input type="image" name="btnAddUser" id="btnAddUser" title="Add new User" src="Resources/Button_Add_16x16.png" style="border-width:0px;position:absolute; top: 40px; left: 259px;" />
+
+
+            <span id="lblDescription" style="font-weight:bold;position: absolute; top: 74px; left: 18px; width: 80px; ">Description</span>
+
+            <input name="txtUserDescription" type="text" value="f1f1f1" onchange="javascript:setTimeout('__doPostBack(\'txtUserDescription\',\'\')', 0)" onkeypress="if (WebForm_TextBoxKeyHandler(event) == false) return false;" id="txtUserDescription" style="position:absolute;top: 72px; left: 104px; width: 146px;" />
+
+            
+            <span id="lblAction" style="font-weight:bold;position: absolute; top: 107px; left: 18px; width: 49px; ">Action</span>
+            
+            <select name="cbxAction" onchange="javascript:setTimeout('__doPostBack(\'cbxAction\',\'\')', 0)" id="cbxAction" style="position:absolute; top: 107px; left: 104px; width: 150px;">
+	<option selected="selected" value="loadExtension">loadExtension</option>
+	<option value="unloadExtension">unloadExtension</option>
+
+</select>
+            
+            <div id="panGrid" style="border-style:None;position:absolute; 
+                top: 145px; left: 18px; height: 250px; width: 347px;">
+	
+                <!-- style="position:absolute; border: 1px solid #000;  -->
+                <!-- панель для сетки с "заголовком" -->                        
+            
+                <div id="panGridHead" style="position:absolute; border: 1px solid #000; 
+                    top: 1px; left: 1px; height: 26px; width: 347px;">
+		
+                    <!-- панель для рамочки под "шапкой" сетки -->                        
+
+                    <span id="lblExtension" style="font-weight:bold;position: absolute; top: 5px; left: 10px; width: 49px;">Extension</span>
+                            
+                    <input type="submit" name="btnAllow" value="Allow" id="btnAllow" title="Check All" style="background-color:White;border-style:None;font-family:Arial;font-size:10pt;font-weight:bold;position:absolute; top: 5px; left: 247px;" />
+                        
+                    <input type="submit" name="btnDeny" value="Deny" id="btnDeny" title="Check All" style="background-color:White;border-style:None;font-family:Arial;font-size:10pt;font-weight:bold;position:absolute; top: 5px; left: 290px;" />
+
+                
+	</div>
+                
+                <div id="panGridRows" style="border-style:None;position:absolute;  
+                    top: 30px; left: 1px; height: 200px; width: 347px;">
+		
+                    
+                    <div>
+			<table cellspacing="2" cellpadding="5" rules="all" border="1" id="GridView1" style="border-style:None;font-family:Arial;font-size:10pt;height:100px;width:349px;">
+				<tr style="height:8px;">
+					<td style="width:600px;">SizeWatcher</td><td style="width:80px;"> 
+                                    <input id="GridView1_ctl02_ckbAllow" type="checkbox" name="GridView1$ctl02$ckbAllow" onclick="javascript:setTimeout('__doPostBack(\'GridView1$ctl02$ckbAllow\',\'\')', 0)" /> 
+                                </td><td style="width:80px;"> 
+                                    <input id="GridView1_ctl02_ckbDeny" type="checkbox" name="GridView1$ctl02$ckbDeny" onclick="javascript:setTimeout('__doPostBack(\'GridView1$ctl02$ckbDeny\',\'\')', 0)" /> 
+                                </td>
+				</tr><tr style="background-color:WhiteSmoke;height:8px;">
+					<td style="width:600px;">MocScanner</td><td style="width:80px;"> 
+                                    <input id="GridView1_ctl03_ckbAllow" type="checkbox" name="GridView1$ctl03$ckbAllow" onclick="javascript:setTimeout('__doPostBack(\'GridView1$ctl03$ckbAllow\',\'\')', 0)" /> 
+                                </td><td style="width:80px;"> 
+                                    <input id="GridView1_ctl03_ckbDeny" type="checkbox" name="GridView1$ctl03$ckbDeny" onclick="javascript:setTimeout('__doPostBack(\'GridView1$ctl03$ckbDeny\',\'\')', 0)" /> 
+                                </td>
+				</tr><tr style="height:8px;">
+					<td style="width:600px;">CloseManager</td><td style="width:80px;"> 
+                                    <input id="GridView1_ctl04_ckbAllow" type="checkbox" name="GridView1$ctl04$ckbAllow" onclick="javascript:setTimeout('__doPostBack(\'GridView1$ctl04$ckbAllow\',\'\')', 0)" /> 
+                                </td><td style="width:80px;"> 
+                                    <input id="GridView1_ctl04_ckbDeny" type="checkbox" name="GridView1$ctl04$ckbDeny" onclick="javascript:setTimeout('__doPostBack(\'GridView1$ctl04$ckbDeny\',\'\')', 0)" /> 
+                                </td>
+				</tr><tr style="background-color:WhiteSmoke;height:8px;">
+					<td style="width:600px;">OpenPriceEstimator</td><td style="width:80px;"> 
+                                    <input id="GridView1_ctl05_ckbAllow" type="checkbox" name="GridView1$ctl05$ckbAllow" onclick="javascript:setTimeout('__doPostBack(\'GridView1$ctl05$ckbAllow\',\'\')', 0)" /> 
+                                </td><td style="width:80px;"> 
+                                    <input id="GridView1_ctl05_ckbDeny" type="checkbox" name="GridView1$ctl05$ckbDeny" onclick="javascript:setTimeout('__doPostBack(\'GridView1$ctl05$ckbDeny\',\'\')', 0)" /> 
+                                </td>
+				</tr><tr style="height:8px;">
+					<td style="width:600px;">SizeFinder</td><td style="width:80px;"> 
+                                    <input id="GridView1_ctl06_ckbAllow" type="checkbox" name="GridView1$ctl06$ckbAllow" onclick="javascript:setTimeout('__doPostBack(\'GridView1$ctl06$ckbAllow\',\'\')', 0)" /> 
+                                </td><td style="width:80px;"> 
+                                    <input id="GridView1_ctl06_ckbDeny" type="checkbox" name="GridView1$ctl06$ckbDeny" onclick="javascript:setTimeout('__doPostBack(\'GridView1$ctl06$ckbDeny\',\'\')', 0)" /> 
+                                </td>
+				</tr><tr style="background-color:WhiteSmoke;height:8px;">
+					<td style="width:600px;">FrontRunner</td><td style="width:80px;"> 
+                                    <input id="GridView1_ctl07_ckbAllow" type="checkbox" name="GridView1$ctl07$ckbAllow" onclick="javascript:setTimeout('__doPostBack(\'GridView1$ctl07$ckbAllow\',\'\')', 0)" /> 
+                                </td><td style="width:80px;"> 
+                                    <input id="GridView1_ctl07_ckbDeny" type="checkbox" name="GridView1$ctl07$ckbDeny" onclick="javascript:setTimeout('__doPostBack(\'GridView1$ctl07$ckbDeny\',\'\')', 0)" /> 
+                                </td>
+				</tr>
+			</table>
+		</div>
+                
+	</div>
+
+
+            
+</div>
+            
+            
+                  
+            
+                  
+
+            <input type="submit" name="btnCancel" value="Undo" onclick="setOnBeforeUnload(false);" id="btnCancel" title="Cancel change User" style="position:absolute; top: 145px; left: 378px; width: 92px;" />
+                    
+            <input type="submit" name="btnSave" value="Save" id="btnSave" title="Save User" style="position:absolute; top: 177px; left: 377px; width: 92px; right: 499px;" />
+
+            <span id="lblSave_Error" style="color:Red;position: absolute; top: 177px; left: 475px;"></span>
+
+            <!--
+            <input id="ckbUpdated" type="checkbox" name="ckbUpdated" onclick="javascript:setTimeout('__doPostBack(\'ckbUpdated\',\'\')', 0)" /> 
+            -->
+
+            <!--
+            сохранение и восстановление положения фокуса
+            http://codeverge.com/asp.net.web-forms/problem-finding-the-active-element-on-a-web/343477            
+                jscript
+            -->
+            <!--
+            <input type="hidden" name="CurrentFocus" id="CurrentFocus" />
+            -->
+            
+            
+    </div>
+
+
+    </form>
+
+    
+
+    <script type="text/javascript" language="JavaScript">
+        // !!! скрипт расположить в конце страницы - чтобы выполнялся после формирования контролов !!!
+        
+        //=====================
+        //=== подтверждающий запрос при закрытии измененного окна
+        
+        // включение.выключение подтверждающего запроса при закрытии измененного окна
+        //window.onbeforeunload = confirmExit;
+        function setOnBeforeUnload(on) {
+            window.onbeforeunload = (on) ? confirmExit : null;
+        }
+        
+        // сам подтверждающий запрос при закрытии измененного окна
+        function confirmExit() {
+            var elem = document.getElementById("btnSave"); // недоступная кнопка Save - признак неизмененности данных!
+            if (elem) {
+                if (elem.type == 'submit' && elem.disabled == true)  
+                    return  // закрытие без подтверждения ================>
+                else                
+                    return 'You have unsaved changes.' // закрытие с подтвержденим ======> 
+            }
+        }
+        
+        // сразу при загрузке включаем подтверждающий запрос при закрытии измененного окна
+        setOnBeforeUnload(true)
+        
+        // т.к. серверные контролы при срабатывании выгружают страницу, то в каждом из них надо
+        // поставить от ключение подтверждающего запроса (иначе запрос будет при срабатывании каждого контрола) !
+        // (в атрибут OnClick добавляем на первое место вызов ф-ии отключения запоса)
+        function Set_OnClickAttrValue()
+        {
+            //alert ("SetOnClickAttrValue()");
+
+            /*
+            // работает:
+            str = document.getElementById( "GridView1_ctl02_ckbDeny" ).getAttribute ("onCliCk", 0)
+            var ind = str.indexOf(":");
+            str2 = str.substring(0, ind+1) + "setOnBeforeUnload(false);" + str.substring(ind+1);
+            document.getElementById( "GridView1_ctl02_ckbDeny" ).setAttribute ("onCliCk", str2)
+            */
+            
+    	    var str;
+    	    var str2;
+            var ind;
+            var idElem;
+    	    var elems = document.getElementsByTagName('*');
+    	    //alert("Элементов: " + elems.length)
+            var bRavno = false;
+            var bRavno1 = false;
+            var bRavno2 = false;
+            for(var i=0; i < elems.length; i++)
+            {
+                idElem = elems[i].getAttribute('id');
+                idType = elems[i].getAttribute('type');
+                idName = elems[i].getAttribute('name');
+                if (idName != null)
+                {
+                    // изменяем/добавляем атрибуты контролов
+                    //   id="GridView1_ctl03_ckbDeny"   - IIS на Windows XP
+                    //   id="GridView1_ckbDeny_1"       - IIS на Windows Server 2012 
+                    //   !!! разные методики формирования ID - искать вхождение подстроки !!!
+                    //bRavno1 = (idElem.substr(idElem.length - 8) == "ckbAllow");
+                    //bRavno2 = (idElem.substr(idElem.length - 7) == "ckbDeny");
+                    bRavno1 = (idElem.indexOf("ckbAllow") + 1);  // indexOf() возвращает если не найдено -1, если найдено - позицию вхождения. В js 0==false, любое др. число даёт true; 
+                    bRavno2 = (idElem.indexOf("ckbDeny") + 1);   // indexOf() возвращает если не найдено -1, если найдено - позицию вхождения. В js 0==false, любое др. число даёт true;
+                    if ((idName == "cbxUserName") || (idName == "cbxAction") ||
+                       (idName == "btnAllow") || (idName == "btnDeny") ||
+                       (idName == "btnAddUser") || (idName == "btnDelUser") ||
+                       (idName == "btnSave") || (idName == "btnCancel") ||
+                       (idName == "btnSaveNew") || (idName == "btnCancelNew") ||
+                       (idName == "txtUserDescription") ||
+                       (idName == "txtUserName") ||
+                        bRavno1 || bRavno2 )
+                    {
+                        //alert("2: idName = " + idName);
+	                    str = elems[i].getAttribute("onClick", 0);
+	                    if (str != null)
+	                    {
+                            // контролы (списки, чекбоксы) с атрибутом - корректируем атрибут (вставляем после начального "javascript:")
+                            //alert("idName = " + idName);
+                            ind = str.indexOf(":");
+                            str2 = str.substring(0, ind+1) + "setOnBeforeUnload(false);" + str.substring(ind+1);
+                            //alert(str2);
+	                        elems[i].setAttribute("onClick", str2);
+	                    } else {
+                            // контролы (кнопки) без атрибута - добавляем атрибут
+	                        elems[i].setAttribute("onClick", "javascript:setOnBeforeUnload(false);");
+	                    }
+                    }
+                }
+            } // for по элементам документа
+        } // Set_OnClickAttrValue()
+    
+        // доопределяем OnClisk своих серверных контролов
+        Set_OnClickAttrValue();
+    
+    </script>
+    
+
+
+    
+</body>
+
+</html>

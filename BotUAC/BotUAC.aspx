@@ -234,9 +234,9 @@
         function confirmExit() {
             var elem = document.getElementById("btnSave"); // недоступная кнопка Save - признак неизмененности данных!
             if (elem) {
-                if (elem.type == 'submit' && elem.disabled == true)  
+                if (elem.type == 'submit' && elem.disabled == true)  // кнопка Save НЕдоступная - не было изменений, закрытие без подтверждения! 
                     return  // закрытие без подтверждения ================>
-                else                
+                else  // кнопка Save доступная - были изменения, закрытие с подтверждением! 
                     return 'You have unsaved changes.' // закрытие с подтвержденим ======> 
             }
         }
@@ -266,8 +266,8 @@
     	    var elems = document.getElementsByTagName('*');
     	    //alert("Элементов: " + elems.length)
             var bRavno = false;
-            var bRavno1 = false;
-            var bRavno2 = false;
+            var bCkbAllow = false;
+            var bCkbDeny = false;
             for(var i=0; i < elems.length; i++)
             {
                 idElem = elems[i].getAttribute('id');
@@ -278,11 +278,11 @@
                     // изменяем/добавляем атрибуты контролов
                     //   id="GridView1_ctl03_ckbDeny"   - IIS на Windows XP
                     //   id="GridView1_ckbDeny_1"       - IIS на Windows Server 2012 
-                    //   !!! разные методики формирования ID - искать вхождение подстроки !!!
-                    //bRavno1 = (idElem.substr(idElem.length - 8) == "ckbAllow");
-                    //bRavno2 = (idElem.substr(idElem.length - 7) == "ckbDeny");
-                    bRavno1 = (idElem.indexOf("ckbAllow") + 1);  // indexOf() возвращает если не найдено -1, если найдено - позицию вхождения. В js 0==false, любое др. число даёт true; 
-                    bRavno2 = (idElem.indexOf("ckbDeny") + 1);   // indexOf() возвращает если не найдено -1, если найдено - позицию вхождения. В js 0==false, любое др. число даёт true;
+                    //   !!! разные методики формирования ID - искать вхождение подстроки (а не окончание строки) !!!
+                    //bCkbAllow = (idElem.substr(idElem.length - 8) == "ckbAllow");
+                    //bCkbDeny = (idElem.substr(idElem.length - 7) == "ckbDeny");
+                    bCkbAllow = (idElem.indexOf("ckbAllow") + 1);  // indexOf() возвращает если не найдено -1, если найдено - позицию вхождения. В js 0==false, любое др. число даёт true; 
+                    bCkbDeny  = (idElem.indexOf("ckbDeny") + 1);   // indexOf() возвращает если не найдено -1, если найдено - позицию вхождения. В js 0==false, любое др. число даёт true;
                     if ((idName == "cbxUserName") || (idName == "cbxAction") ||
                        (idName == "btnAllow") || (idName == "btnDeny") ||
                        (idName == "btnAddUser") || (idName == "btnDelUser") ||
@@ -290,7 +290,7 @@
                        (idName == "btnSaveNew") || (idName == "btnCancelNew") ||
                        (idName == "txtUserDescription") ||
                        (idName == "txtUserName") ||
-                        bRavno1 || bRavno2 )
+                        bCkbAllow || bCkbDeny )
                     {
                         //alert("2: idName = " + idName);
 	                    str = elems[i].getAttribute("onClick", 0);

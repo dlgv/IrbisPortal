@@ -1,0 +1,128 @@
+<div id="divMain">
+    
+            <span id="lblUserName" style="left: 17px; top: 41px; width: 49px; font-weight: bold; position: absolute;">User</span>
+
+            
+
+            
+
+            <select name="cbxUserName" id="cbxUserName" style="left: 104px; top: 39px; width: 150px; position: absolute;" onclick="javascript:setOnBeforeUnload(false);" onchange="javascript:setTimeout('__doPostBack(\'cbxUserName\',\'\')', 0)">
+	<option selected="selected" value="F-01">F-01</option>
+	<option value="H-001">H-001</option>
+	<option value="HOME-1">HOME-1</option>
+
+</select>
+
+            <input name="btnDelUser" title="Delete current User" id="btnDelUser" style="border-width: 0px; left: 280px; top: 41px; position: absolute;" onclick="setOnBeforeUnload(false);return confirm('Are you sure you want to delete the user?');" type="image" src="Resources/Button_Del_16x16.png">
+            
+            <input name="btnAddUser" title="Add new User" id="btnAddUser" style="border-width: 0px; left: 259px; top: 40px; position: absolute;" onclick="javascript:setOnBeforeUnload(false);" type="image" src="Resources/Button_Add_16x16.png">
+
+
+            <span id="lblDescription" style="left: 18px; top: 74px; width: 80px; font-weight: bold; position: absolute;">Description</span>
+
+            <input name="txtUserDescription" id="txtUserDescription" style="left: 104px; top: 72px; width: 146px; position: absolute;" onkeypress="if (WebForm_TextBoxKeyHandler(event) == false) return false;" onclick="javascript:setOnBeforeUnload(false);" onchange="javascript:setTimeout('__doPostBack(\'txtUserDescription\',\'\')', 0)" type="text" value="первый-1">
+
+            
+            <span id="lblAction" style="left: 18px; top: 107px; width: 49px; font-weight: bold; position: absolute;">Action</span>
+            
+            <select name="cbxAction" id="cbxAction" style="left: 104px; top: 107px; width: 150px; position: absolute;" onclick="javascript:setOnBeforeUnload(false);" onchange="javascript:setTimeout('__doPostBack(\'cbxAction\',\'\')', 0)">
+	<option selected="selected" value="loadExtension">loadExtension</option>
+	<option value="unloadExtension">unloadExtension</option>
+
+</select>
+            
+            <div id="panGrid" style="left: 18px; top: 145px; width: 347px; height: 250px; position: absolute;">
+	
+                <!-- style="position:absolute; border: 1px solid #000;  -->
+                <!-- панель для сетки с "заголовком" -->                        
+            
+                <div id="panGridHead" style="border: 1px solid rgb(0, 0, 0); border-image: none; left: 1px; top: 1px; width: 347px; height: 26px; position: absolute;">
+		
+                    <!-- панель для рамочки под "шапкой" сетки -->                        
+
+                    <span id="lblExtension" style="left: 10px; top: 5px; width: 49px; font-weight: bold; position: absolute;">Extension</span>
+                            
+                    <input name="btnAllow" title="Check All" id="btnAllow" style="left: 247px; top: 5px; font-family: Arial; font-size: 10pt; font-weight: bold; position: absolute; background-color: white;" onclick="javascript:setOnBeforeUnload(false);" type="submit" value="Allow">
+                        
+                    <input name="btnDeny" title="Check All" id="btnDeny" style="left: 290px; top: 5px; font-family: Arial; font-size: 10pt; font-weight: bold; position: absolute; background-color: white;" onclick="javascript:setOnBeforeUnload(false);" type="submit" value="Deny">
+
+                
+	</div>
+                
+                <div id="panGridRows" style="left: 1px; top: 30px; width: 347px; height: 200px; position: absolute;">
+		
+                    
+                    <div>
+			<table id="GridView1" style="width: 349px; height: 100px; font-family: Arial; font-size: 10pt;" border="1" rules="all" cellspacing="2" cellpadding="5">
+				<tbody><tr style="height: 8px;">
+					<td style="width: 600px;">SizeWatcher</td><td style="width: 80px;"> 
+                                    <input name="GridView1$ctl02$ckbAllow" id="GridView1_ctl02_ckbAllow" onclick="javascript:setOnBeforeUnload(false);setTimeout('__doPostBack(\'GridView1$ctl02$ckbAllow\',\'\')', 0)" type="checkbox"> 
+                                </td><td style="width: 80px;"> 
+                                    <input name="GridView1$ctl02$ckbDeny" id="GridView1_ctl02_ckbDeny" onclick="javascript:setOnBeforeUnload(false);setTimeout('__doPostBack(\'GridView1$ctl02$ckbDeny\',\'\')', 0)" type="checkbox"> 
+                                </td>
+				</tr><tr style="height: 8px; background-color: whitesmoke;">
+					<td style="width: 600px;">MocScanner</td><td style="width: 80px;"> 
+                                    <input name="GridView1$ctl03$ckbAllow" id="GridView1_ctl03_ckbAllow" onclick="javascript:setOnBeforeUnload(false);setTimeout('__doPostBack(\'GridView1$ctl03$ckbAllow\',\'\')', 0)" type="checkbox"> 
+                                </td><td style="width: 80px;"> 
+                                    <input name="GridView1$ctl03$ckbDeny" id="GridView1_ctl03_ckbDeny" onclick="javascript:setOnBeforeUnload(false);setTimeout('__doPostBack(\'GridView1$ctl03$ckbDeny\',\'\')', 0)" type="checkbox"> 
+                                </td>
+				</tr><tr style="height: 8px;">
+					<td style="width: 600px;">CloseManager</td><td style="width: 80px;"> 
+                                    <input name="GridView1$ctl04$ckbAllow" id="GridView1_ctl04_ckbAllow" onclick="javascript:setOnBeforeUnload(false);setTimeout('__doPostBack(\'GridView1$ctl04$ckbAllow\',\'\')', 0)" type="checkbox"> 
+                                </td><td style="width: 80px;"> 
+                                    <input name="GridView1$ctl04$ckbDeny" id="GridView1_ctl04_ckbDeny" onclick="javascript:setOnBeforeUnload(false);setTimeout('__doPostBack(\'GridView1$ctl04$ckbDeny\',\'\')', 0)" type="checkbox"> 
+                                </td>
+				</tr><tr style="height: 8px; background-color: whitesmoke;">
+					<td style="width: 600px;">OpenPriceEstimator</td><td style="width: 80px;"> 
+                                    <input name="GridView1$ctl05$ckbAllow" id="GridView1_ctl05_ckbAllow" onclick="javascript:setOnBeforeUnload(false);setTimeout('__doPostBack(\'GridView1$ctl05$ckbAllow\',\'\')', 0)" type="checkbox"> 
+                                </td><td style="width: 80px;"> 
+                                    <input name="GridView1$ctl05$ckbDeny" id="GridView1_ctl05_ckbDeny" onclick="javascript:setOnBeforeUnload(false);setTimeout('__doPostBack(\'GridView1$ctl05$ckbDeny\',\'\')', 0)" type="checkbox"> 
+                                </td>
+				</tr><tr style="height: 8px;">
+					<td style="width: 600px;">SizeFinder</td><td style="width: 80px;"> 
+                                    <input name="GridView1$ctl06$ckbAllow" id="GridView1_ctl06_ckbAllow" onclick="javascript:setOnBeforeUnload(false);setTimeout('__doPostBack(\'GridView1$ctl06$ckbAllow\',\'\')', 0)" type="checkbox"> 
+                                </td><td style="width: 80px;"> 
+                                    <input name="GridView1$ctl06$ckbDeny" id="GridView1_ctl06_ckbDeny" onclick="javascript:setOnBeforeUnload(false);setTimeout('__doPostBack(\'GridView1$ctl06$ckbDeny\',\'\')', 0)" type="checkbox"> 
+                                </td>
+				</tr><tr style="height: 8px; background-color: whitesmoke;">
+					<td style="width: 600px;">FrontRunner</td><td style="width: 80px;"> 
+                                    <input name="GridView1$ctl07$ckbAllow" id="GridView1_ctl07_ckbAllow" onclick="javascript:setOnBeforeUnload(false);setTimeout('__doPostBack(\'GridView1$ctl07$ckbAllow\',\'\')', 0)" type="checkbox"> 
+                                </td><td style="width: 80px;"> 
+                                    <input name="GridView1$ctl07$ckbDeny" id="GridView1_ctl07_ckbDeny" onclick="javascript:setOnBeforeUnload(false);setTimeout('__doPostBack(\'GridView1$ctl07$ckbDeny\',\'\')', 0)" type="checkbox"> 
+                                </td>
+				</tr>
+			</tbody></table>
+		</div>
+                
+	</div>
+
+
+            
+</div>
+            
+            
+                  
+            
+                  
+
+            <input name="btnCancel" title="Cancel change User" id="btnCancel" style="left: 378px; top: 145px; width: 92px; position: absolute;" onclick="setOnBeforeUnload(false);setOnBeforeUnload(false);" type="submit" value="Undo">
+                    
+            <input name="btnSave" title="Save User" id="btnSave" style="left: 377px; top: 177px; width: 92px; right: 499px; position: absolute;" onclick="javascript:setOnBeforeUnload(false);" type="submit" value="Save">
+
+            <span id="lblSave_Error" style="left: 475px; top: 177px; color: red; position: absolute;"></span>
+
+            <!--
+            <input id="ckbUpdated" type="checkbox" name="ckbUpdated" onclick="javascript:setTimeout('__doPostBack(\'ckbUpdated\',\'\')', 0)" /> 
+            -->
+
+            <!--
+            сохранение и восстановление положения фокуса
+            http://codeverge.com/asp.net.web-forms/problem-finding-the-active-element-on-a-web/343477            
+                jscript
+            -->
+            <!--
+            <input type="hidden" name="CurrentFocus" id="CurrentFocus" />
+            -->
+            
+            
+    </div>

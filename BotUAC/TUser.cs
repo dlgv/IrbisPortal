@@ -12,6 +12,8 @@ namespace BotUAC
     [Serializable]
     public class TUser
     {
+        public const int UserDescriptionMaxLength = 250;
+
         private string userName;
         private string userDescription;
         private string userRole;
@@ -55,7 +57,8 @@ namespace BotUAC
         {
             XElement xe = new XElement("user");
             xe.Add(new XElement("userName", new XText(this.userName)) );
-            xe.Add(new XElement("userDescription", new XText(this.userDescription)));
+            xe.Add(new XElement("userDescription", new XText( (this.userDescription != null ? this.userDescription : ""))));
+            //xe.Add(new XElement("userDescription", new XText(this.userDescription)));
             //xe.Add(new XElement("userRole", new XText(this.userRole)) );  - пока без роей
             xe.Add(permissions.ToXElement());
             return xe; //==============>
